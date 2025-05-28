@@ -1,0 +1,83 @@
+{
+  "en": {
+    "LanguageWelcome": "Welcome!",
+    "ChooseLanguage": "Main Menu:",
+    "MenuOption": [
+      "1. About us.",
+      "2. See course and change.",
+      "3. Change card PIN.",
+      "4. Card transactions.",
+      "5. Connect SMS to phone.",
+      "6. Pay to phone.",
+      "7. Change language.",
+      "8. Exit."
+    ],
+    "PromptOption": "Choose an option (1-8): ",
+    "InvalidOption": "Please enter a valid number.",
+    "InvalidOptionRange": "Option not found. Choose between 1 and 8.",
+    "AboutUs": "Our bank is all right, our bank has been operating for 3 years and we also provide ATM cashing, payment to a phone number, and SMS notification.",
+    "CourseInfo": "Here is the current exchange rate info...",
+    "ChangePin": "Enter your new PIN code.",
+    "Transactions": "List of recent card transactions.",
+    "ConnectSMS": "SMS notifications have been enabled for your phone number.",
+    "BackToMenu": "Press Enter to return to menu.",
+    "Exit": "Exiting system."
+  },
+  "ru": {
+    "LanguageWelcome": "Добро пожаловать!",
+    "ChooseLanguage": "Главное меню:",
+    "MenuOption": [
+      "1. О компании.",
+      "2. Просмотр курса.",
+      "3. Изменить PIN карты.",
+      "4. Транзакции с картой.",
+      "5. Подключить смс на телефон.",
+      "6. Оплата телефона.",
+      "7. Вернуться на выбор языка.",
+      "8. Выход."
+    ],
+    "PromptOption": "Введите число (1-8): ",
+    "InvalidOption": "Введите корректное число.",
+    "InvalidOptionRange": "Нет такой опции. Выберите от 1 до 8.",
+    "AboutUs": "Наш банк Все народу наш банк уже работает 3 года и также мы предостовляем обналичку в банкоматах оплата на номер телефона подключение смс оповещения.",
+    "CourseInfo": "Текущий курс валют отображается здесь...",
+    "ChangePin": "Введите новый PIN код.",
+    "Transactions": "Список последних транзакций.",
+    "ConnectSMS": "SMS-уведомления подключены к вашему номеру телефона.",
+    "BackToMenu": "Нажмите Enter для возврата в меню.",
+    "Exit": "Выход из системы.",
+    "SeeCourseMenu":[
+      " Курс сум - доллар.",
+      " Курс сум - рубль.",
+      " Курс доллар - сум.",
+      "1. Обменять валюту.",
+      "2. Выйти в главное меню.",
+      "3. Выйти из программы."
+    ],
+    "MenuCHange":""
+  },
+  "uz": {
+      "LanguageWelcome": "Xush kelibsiz!",
+      "ChooseLanguage": "Asosiy menyu:",
+      "MenuOption": [
+          "1. Kompaniya haqida.",
+          "2. Kursni ko‘rish.",
+          "3. PIN kodni o‘zgartirish.",
+          "4. Karta tranzaksiyalari.",
+          "5. Telefonga SMS ulash.",
+          "6. Telefonga tolov.",
+          "7. Tilni o‘zgartirish.",
+          "8. Chiqish."
+      ],
+      "PromptOption": "Bo‘limni tanlang (1-8): ",
+      "InvalidOption": "Iltimos, to‘g‘ri raqam kiriting.",
+      "InvalidOptionRange": "Noto‘g‘ri tanlov. Iltimos, 1 dan 8 gacha tanlang.",
+      "AboutUs": "Bizning bankimiz hamma odamlar bizning bankimiz allaqachon 3 yildan beri ishlamoqda va biz bankomatlarda naqd pul beramiz telefon raqamiga to'lov SMS-xabarlarni ulash.",
+      "CourseInfo": "Joriy valyuta kurslari quyida ko‘rsatilgan...",
+      "ChangePin": "Yangi PIN kodni kiriting.",
+      "Transactions": "Oxirgi karta tranzaksiyalar ro‘yxati.",
+      "ConnectSMS": "Telefon raqamingizga SMS bildirishnomalar ulandi.",
+      "BackToMenu": "Menyuga qaytish uchun Enter tugmasini bosing.",
+      "Exit": "Tizimdan chiqilmoqda."
+  }
+}

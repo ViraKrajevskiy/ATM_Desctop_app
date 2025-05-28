@@ -1,0 +1,2 @@
+class Tranzaction:
+    pass
