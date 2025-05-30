@@ -1,0 +1,2 @@
+def payphone():
+    pass

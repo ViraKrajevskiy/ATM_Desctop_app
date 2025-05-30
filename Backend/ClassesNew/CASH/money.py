@@ -1,6 +1,6 @@
 from peewee import *
 
-from Backend.data_base.database import BaseModel
+from Backend.data_base.core import BaseModel
 
 class Money(BaseModel):
     moeny_id = IntegerField()

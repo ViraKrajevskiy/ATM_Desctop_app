@@ -1,15 +1,13 @@
-from enum import UNIQUE
-
 from peewee import *
 
 from Backend.ClassesNew.ROLE.base_user_m import DefaultUser, Role
-from Backend.data_base.database import BaseModel
+from Backend.data_base.core import BaseModel
 
 
 class Incasator(BaseModel):
-    login = CharField(UNIQUE=True)
-    password = CharField(UNIQUE=True)
-    default_user = ForeignKeyField('DefaultUser', related_name='incasator')
+    login = CharField(unique=True)
+    password = CharField(unique=True)
+    default_user = ForeignKeyField(DefaultUser, related_name='incasator')
 
     def save(self, *args, **kwargs):
         role_obj, _ = Role.get_or_create(id=1, defaults={'access': True})

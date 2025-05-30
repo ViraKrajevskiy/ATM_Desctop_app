@@ -1,5 +1,6 @@
-from Backend.data_base.database import BaseModel
+# from Backend.data_base.database import BaseModel
 
-
-class Tranzaction(BaseModel):
-    
+#
+# class TranzactionMoney(BaseModel):
+#     money =
+#

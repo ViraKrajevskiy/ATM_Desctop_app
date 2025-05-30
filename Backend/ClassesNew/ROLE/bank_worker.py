@@ -3,13 +3,12 @@ from enum import UNIQUE
 from peewee import *
 
 from Backend.ClassesNew.ROLE.base_user_m import Role, DefaultUser
-from Backend.data_base.database import BaseModel
-
+from Backend.data_base.core import BaseModel
 
 class BankWorker(BaseModel):
-    login = CharField(UNIQUE=True)
-    password = CharField(UNIQUE=True)
-    enter = ForeignKeyField('DefaultUser',backref='bankworker')
+    login = CharField(unique=True)
+    password = CharField(unique=True)
+    enter = ForeignKeyField(DefaultUser,backref='bankworker')
 
     def save(self, *args, **kwargs):
         role, created = Role.get_or_create(access=False, defaults={'id': None})

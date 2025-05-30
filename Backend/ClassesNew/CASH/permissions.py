@@ -1,4 +1,4 @@
-from Backend.data_base.database import BaseModel
+from Backend.data_base.core import BaseModel
 
 
 class Permissions(BaseModel):
