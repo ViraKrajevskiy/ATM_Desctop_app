@@ -5,15 +5,19 @@ from Backend.data_base.database import BaseModel
 
 class Role(BaseModel):
     id = AutoField()
-    INCOSATOR = 'Incosator'
-    BANK_WORKER = 'BankWorker'
-    USER = 'User'
+    name = CharField(unique=True)
     access = BooleanField(default=False)
 
+    INCOSATOR = 'incosator'
+    BANK_WORKER = 'bankworker'
+    USER = 'user'
+
+
 class DefaultUser(BaseModel):
-    choicefl = ()
+    choicefl = ForeignKeyField('Role', backref='role')
     id = AutoField()
     first_name = CharField()
     surname = CharField()
     last_name = CharField()
     created_at = DateTimeField(default=datetime.datetime.now)
+

@@ -1,0 +1,9 @@
+from peewee import *
+
+from Backend.data_base.database import BaseModel
+
+class Money(BaseModel):
+    moeny_id = IntegerField()
+    moeny_nominal = IntegerField()
+    type = CharField()
+    date_made = DateTimeField()
