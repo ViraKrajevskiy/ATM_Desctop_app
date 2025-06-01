@@ -1,5 +1,5 @@
 from Backend.functions.account.account import change_pin
-from Backend.functions.main_menu.connect_sms import connect_sms_phone
+from Backend.functions.phone.connect_sms import connect_sms_phone
 from Backend.functions.phone.pay_phone import payphone
 from Backend.functions.see_course_mon.see_course import see_course_and_change
 from Backend.functions.translate.TranslateMenu import *
@@ -51,7 +51,3 @@ def main_menu():
 
 if __name__ == "__main__":
     main_menu()
-
-
-
-    

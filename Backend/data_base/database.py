@@ -7,14 +7,16 @@ from Backend.ClassesNew.ROLE.base_user_m import DefaultUser, Role
 from Backend.ClassesNew.ROLE.incasator import Incasator
 from Backend.ClassesNew.ROLE.user import User
 from Backend.ClassesNew.ATM.atm import Atm
+from Backend.functions.see_course_mon.course_rater_func import CurrencyRate
 
 db.connect()
 db.create_tables([
     Role, DefaultUser, User,
     Incasator, BankWorker,
     Money, PhoneNumber, CreditCards,
-    Wallet, Atm
+    Wallet, Atm, CurrencyRate
 ])
+
 
 
 
@@ -25,7 +27,7 @@ def print_all_records(model):
         print(obj.__data__)  # __data__ — словарь с полями и значениями
     print()
 
-models = [PhoneNumber, CreditCards, BankWorker, User, Incasator, DefaultUser, Role, Money, Wallet, Atm]
+models = [PhoneNumber, CreditCards, BankWorker, User, Incasator, DefaultUser, Role, Money, Wallet, Atm,CurrencyRate,]
 
 for model in models:
     print_all_records(model)

@@ -1,7 +1,13 @@
+# with open("translation.json", "r", encoding="utf-8") as f:
+#     translations = json.load(f)
+import os
 import json
 
+# Абсолютный путь к файлу translation.json
+current_dir = os.path.dirname(__file__)
+file_path = os.path.join(current_dir, "translation.json")
 
-with open("translation.json", "r", encoding="utf-8") as f:
+with open(file_path, "r", encoding="utf-8") as f:
     translations = json.load(f)
 
 current_language = None
