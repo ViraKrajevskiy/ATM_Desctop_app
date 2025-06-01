@@ -31,6 +31,7 @@ def get_latest_rate(currency_pair: str) -> float:
 currency_simulation_started = False
 
 def see_course_and_change(lang):
+
     global currency_simulation_started
 
     if not currency_simulation_started:
@@ -42,6 +43,7 @@ def see_course_and_change(lang):
         db.connect()
 
     while True:
+        data = translations[lang]
         print()
         print("=== Курсы валют ===")
         usd = get_latest_rate("SUM->USD")
@@ -52,23 +54,22 @@ def see_course_and_change(lang):
         print(f"{data['SeeCourseMenu'][1]} {rub} UZS")   # Курс сум - рубль.
         print(f"{data['SeeCourseMenu'][2]} {eur} UZS")   # Курс сум - евро.
 
-        print()
         print(data['SeeCourseMenu'][3])  # 1. Обменять валюту.
         print(data['SeeCourseMenu'][4])  # 2. Выйти в главное меню.
         print(data['SeeCourseMenu'][5])  # 3. Выйти из программы.
 
         try:
-            user_input = int(input("Выберите действие: "))
+            user_input = int(input(data['ChooseValue']))
 
             if user_input == 1:
                 print(">> Функция обмена валюты пока не реализована.")
             elif user_input == 2:
-                break  # выход в главное меню
+                break
             elif user_input == 3:
-                print("Выход из программы.")
+                print(data['Exit'])
                 exit(0)
             else:
-                print("Неверный выбор. Попробуйте снова.")
+                print(data['InvalidOptionRange'])
 
         except ValueError:
-            print("Введите число.")
+            print(data[''])
