@@ -2,7 +2,6 @@ from Backend.data_base.database import db
 from Backend.functions.see_course_mon.course_rater_func import CurrencyRate, start_currency_simulation
 from Backend.functions.translate.TranslateMenu import translations
 
-
 def get_latest_rate(currency_pair: str) -> float:
     rate_obj = (CurrencyRate
                 .select()

@@ -3,10 +3,10 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.graphics import Color, Rectangle, RoundedRectangle
+from kivy.graphics import Color, RoundedRectangle
 import json
 
-from Backend.functions.see_course_mon.new_func import CurrencyScreen
+from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
 
 
 class RoundedButton(Button):
@@ -60,9 +60,8 @@ class LanguageScreen(Screen):
 
 
 # Load translations
-with open("translation.json", "r", encoding="utf-8") as f:
+with open('translation.json', "r", encoding="utf-8") as f:
     translations = json.load(f)
-
 
 class MainMenuScreen(Screen):
     def __init__(self, **kwargs):
@@ -84,14 +83,14 @@ class MainMenuScreen(Screen):
 
         screen_map = {
             0: 'about',
-            1: 'course',
+            1: 'currency',
             2: 'change_pin',
             3: 'transactions',
             4: 'connect_sms',
             5: 'pay_phone',
             6: 'language',
-            7: 'currency',
-             }
+        }
+
 
 
         for idx, item in enumerate(self.data['MenuOption']):
@@ -153,7 +152,7 @@ class BankingApp(App):
         sm.add_widget(LanguageScreen(name='language'))
         sm.add_widget(MainMenuScreen(name='menu'))
         sm.add_widget(InfoScreen(name='about', text_key='AboutUs'))
-        sm.add_widget(CurrencyScreen(name='see_course'))
+        sm.add_widget(CurrencyScreen(name='currency'))  # имя соответствует screen_map
         sm.add_widget(InfoScreen(name='change_pin', text_key='ChangePin'))
         sm.add_widget(InfoScreen(name='transactions', text_key='Transactions'))
         sm.add_widget(InfoScreen(name='connect_sms', text_key='ConnectSMS'))

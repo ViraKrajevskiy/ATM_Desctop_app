@@ -35,12 +35,7 @@ def update_currency_rate(currency_pair: str, min_rate: float, max_rate: float):
                  .select()
                  .where(CurrencyRate.currency_pair == currency_pair)
                  .order_by(CurrencyRate.timestamp.desc()))
-
-        if query.count() > 10:
-            for old_record in query[10:]:
-                old_record.delete_instance()
-
-        time.sleep(120)  # 2 минуты
+        time.sleep(240)  # 2 минуты
 
 # Запуск потоков симуляции
 def start_currency_simulation():

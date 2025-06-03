@@ -5,7 +5,7 @@
     "back_button": "Back",
     "LanguageWelcome": "Welcome!",
     "ChooseLanguage": "Main Menu:",
-    "select_language":"Ru",
+    "select_language": "Ru",
     "MenuOption": [
       "1. About us.",
       "2. See course and change.",
@@ -25,7 +25,32 @@
     "Transactions": "List of recent card transactions.",
     "ConnectSMS": "SMS notifications have been enabled for your phone number.",
     "BackToMenu": "Press Enter to return to menu.",
-    "Exit": "Exiting system."
+    "Exit": "Exiting system.",
+    "SeeCourseMenu": [
+      "1. SUM to USD rate.",
+      "2. SUM to RUB rate.",
+      "3. SUM to EUR rate.",
+      "1. Exchange currency.",
+      "2. Back to main menu.",
+      "3. Exit the program."
+    ],
+    "ChooseValue": "Select an action:",
+    "LoginCardMOney": "Cash or card?",
+    "Money": "Cash",
+    "Card": "Card",
+    "EnterCardNum": "Enter your card number:",
+    "EnterPIN": "Enter your PIN code:",
+    "KardNotCorrect": "Incorrect card number or PIN code.",
+    "MoneyRater": "Enter your phone number or last 4 digits of your card.",
+    "Enter_user_choice": [
+      "Choose the type of currency exchange.",
+      "SUM -> USD",
+      "SUM -> RUB",
+      "SUM -> EUR",
+      "USD -> SUM",
+      "EUR -> SUM",
+      "RUB -> SUM"
+    ]
   },
   "ru": {
     "greeting": "Добро пожаловать!",
@@ -43,7 +68,7 @@
       "7. Вернуться на выбор языка.",
       "8. Выход."
     ],
-    "EnterUserChoice":"Выберите одно из действий:",
+    "EnterUserChoice": "Выберите одно из действий:",
     "PromptOption": "Введите число (1-8): ",
     "InvalidOption": "Введите корректное число.",
     "InvalidOptionRange": "Нет такой опции.",
@@ -54,60 +79,82 @@
     "ConnectSMS": "SMS-уведомления подключены к вашему номеру телефона.",
     "BackToMenu": "Нажмите Enter для возврата в меню.",
     "Exit": "Спасибо что выбрали нас.",
-    "SeeCourseMenu":[
-      " Курс сум - доллар.",
-      " Курс сум - рубль.",
-      " Курс сум - евро.",
+    "SeeCourseMenu": [
+      "1. Курс сум - доллар.",
+      "2. Курс сум - рубль.",
+      "3. Курс сум - евро.",
       "1. Обменять валюту.",
       "2. Выйти в главное меню.",
       "3. Выйти из программы."
     ],
-    "ChooseValue":" Выберите действие:",
-
-    "LoginCardMOney":"Наличные или картой.",
-    "Money":"Наличным",
-    "Card":"Картой",
-    "EnterCardNum":"Введите номер карты:",
-    "EnterPIN":"Введите пин код:",
-    "KardNotCorrect":"Карта или пин код введены неправильно.",
-
-    "MoneyRater":"Введите ваш номер телефона или последние 4 цыфры ващей карты",
-
-    "Enter_user_choice":[
+    "ChooseValue": "Выберите действие:",
+    "LoginCardMOney": "Наличными или картой.",
+    "Money": "Наличными",
+    "Card": "Картой",
+    "EnterCardNum": "Введите номер карты:",
+    "EnterPIN": "Введите пин-код:",
+    "KardNotCorrect": "Карта или пин-код введены неверно.",
+    "MoneyRater": "Введите ваш номер телефона или последние 4 цифры карты.",
+    "Enter_user_choice": [
       "Выберите тип обмена валюты.",
-      "Сум == Доллар",
-      "Сум == рубль",
-      "Сум == Евро",
-      "Доллар == Сум",
-      "Евро == Сум",
-      "Рубль == Сум"
+      "Сум -> Доллар",
+      "Сум -> Рубль",
+      "Сум -> Евро",
+      "Доллар -> Сум",
+      "Евро -> Сум",
+      "Рубль -> Сум"
     ]
   },
   "uz": {
     "greeting": "Xush kelibsiz!",
     "description": "Bu ko‘p tilli bank ilovasi.",
     "back_button": "Orqaga",
-      "LanguageWelcome": "Xush kelibsiz!",
-      "ChooseLanguage": "Asosiy menyu:",
-      "MenuOption": [
-          "1. Kompaniya haqida.",
-          "2. Kursni ko‘rish.",
-          "3. PIN kodni o‘zgartirish.",
-          "4. Karta tranzaksiyalari.",
-          "5. Telefonga SMS ulash.",
-          "6. Telefonga tolov.",
-          "7. Tilni o‘zgartirish.",
-          "8. Chiqish."
-      ],
-      "PromptOption": "Bo‘limni tanlang (1-8): ",
-      "InvalidOption": "Iltimos, to‘g‘ri raqam kiriting.",
-      "InvalidOptionRange": "Noto‘g‘ri tanlov. Iltimos, 1 dan 8 gacha tanlang.",
-      "AboutUs": "Bizning bankimiz hamma odamlar bizning bankimiz allaqachon 3 yildan beri ishlamoqda va biz bankomatlarda naqd pul beramiz telefon raqamiga to'lov SMS-xabarlarni ulash.",
-      "CourseInfo": "Joriy valyuta kurslari quyida ko‘rsatilgan...",
-      "ChangePin": "Yangi PIN kodni kiriting.",
-      "Transactions": "Oxirgi karta tranzaksiyalar ro‘yxati.",
-      "ConnectSMS": "Telefon raqamingizga SMS bildirishnomalar ulandi.",
-      "BackToMenu": "Menyuga qaytish uchun Enter tugmasini bosing.",
-      "Exit": "Tizimdan chiqilmoqda."
+    "LanguageWelcome": "Xush kelibsiz!",
+    "ChooseLanguage": "Asosiy menyu:",
+    "MenuOption": [
+      "1. Kompaniya haqida.",
+      "2. Kursni ko‘rish.",
+      "3. PIN kodni o‘zgartirish.",
+      "4. Karta tranzaksiyalari.",
+      "5. Telefonga SMS ulash.",
+      "6. Telefonga tolov.",
+      "7. Tilni o‘zgartirish.",
+      "8. Chiqish."
+    ],
+    "PromptOption": "Bo‘limni tanlang (1-8): ",
+    "InvalidOption": "Iltimos, to‘g‘ri raqam kiriting.",
+    "InvalidOptionRange": "Noto‘g‘ri tanlov. Iltimos, 1 dan 8 gacha tanlang.",
+    "AboutUs": "Bizning bankimiz hamma odamlar bizning bankimiz allaqachon 3 yildan beri ishlamoqda va biz bankomatlarda naqd pul beramiz telefon raqamiga to'lov SMS-xabarlarni ulash.",
+    "CourseInfo": "Joriy valyuta kurslari quyida ko‘rsatilgan...",
+    "ChangePin": "Yangi PIN kodni kiriting.",
+    "Transactions": "Oxirgi karta tranzaksiyalar ro‘yxati.",
+    "ConnectSMS": "Telefon raqamingizga SMS bildirishnomalar ulandi.",
+    "BackToMenu": "Menyuga qaytish uchun Enter tugmasini bosing.",
+    "Exit": "Tizimdan chiqilmoqda.",
+    "SeeCourseMenu": [
+      "1. So'm - AQSH dollari kursi.",
+      "2. So'm - Rubl kursi.",
+      "3. So'm - Yevro kursi.",
+      "1. Valyutani almashtirish.",
+      "2. Bosh menyuga qaytish.",
+      "3. Dasturdan chiqish."
+    ],
+    "ChooseValue": "Amalni tanlang:",
+    "LoginCardMOney": "Naqd yoki karta orqali?",
+    "Money": "Naqd",
+    "Card": "Karta",
+    "EnterCardNum": "Karta raqamingizni kiriting:",
+    "EnterPIN": "PIN kodni kiriting:",
+    "KardNotCorrect": "Karta raqami yoki PIN noto‘g‘ri.",
+    "MoneyRater": "Telefon raqamingizni yoki kartangizning oxirgi 4 raqamini kiriting.",
+    "Enter_user_choice": [
+      "Valyuta almashuv turini tanlang.",
+      "So'm -> AQSH dollari",
+      "So'm -> Rubl",
+      "So'm -> Yevro",
+      "AQSH dollari -> So'm",
+      "Yevro -> So'm",
+      "Rubl -> So'm"
+    ]
   }
 }
