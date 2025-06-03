@@ -1,7 +1,6 @@
 from peewee import *
 import datetime
 
-from Backend.ClassesNew.ROLE.user import User
 from Backend.data_base.core import BaseModel
 
 
@@ -13,8 +12,6 @@ class PhoneNumber(BaseModel):
 class CreditCards(BaseModel):
     id = AutoField()
 
-    owner = ForeignKeyField(User, backref='owner')
-
     card_number = IntegerField()
     balance = IntegerField()
     security_code = IntegerField()
@@ -25,4 +22,4 @@ class CreditCards(BaseModel):
 
     card_give_date = DateField(default=datetime.datetime.now)
     card_end_date = DateField()
-    phone_field = ForeignKeyField(PhoneNumber, backref='phones')
+    phone_field = ManyToManyField(PhoneNumber, backref='phones')

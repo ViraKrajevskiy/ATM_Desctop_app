@@ -1,23 +1,6 @@
-# from Backend.functions.translate.TranslateMenu import select_language
-#
-# def see_course_and_change():
-#
-#
-#     lang = select_language()
-#
-#     while True:
-#         data = translations[lang]
-#
-#         for item in data['SeeCourseMenu']:
-#             print(f'')
-#
-#         user_inputs = int(input())
-#
-#         if user_inputs == 1:
-#
 from Backend.data_base.database import db
 from Backend.functions.see_course_mon.course_rater_func import CurrencyRate, start_currency_simulation
-from Backend.functions.translate.TranslateMenu import select_language, translations
+from Backend.functions.translate.TranslateMenu import translations
 
 
 def get_latest_rate(currency_pair: str) -> float:

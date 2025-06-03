@@ -1,13 +1,14 @@
 from peewee import *
 
 from Backend.ClassesNew.CASH.credit_cards import CreditCards
-from Backend.ClassesNew.CASH.money import Money
+from Backend.ClassesNew.CASH.money import Money,OtherRate
 from Backend.data_base.core import BaseModel
 
 
 class Wallet(BaseModel):
     id = AutoField()
     money_count = ForeignKeyField(Money, backref='money')
+    other_money = ForeignKeyField(OtherRate, backref='otherrate')
     card = ForeignKeyField(CreditCards, backref='card')
 
     def get_wallet_balance(wallet_id: int):

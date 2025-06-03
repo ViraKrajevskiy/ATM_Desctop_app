@@ -1,9 +1,6 @@
-# with open("translation.json", "r", encoding="utf-8") as f:
-#     translations = json.load(f)
 import os
 import json
 
-# Абсолютный путь к файлу translation.json
 current_dir = os.path.dirname(__file__)
 file_path = os.path.join(current_dir, "translation.json")
 
@@ -35,7 +32,14 @@ def select_language():
         lang_code = int(user_input)
 
         if lang_code not in lang_map:
-            print("Неверный код выберите от 1 до 3.")
-            return select_language()
+            print("Неверный код, выберите от 1 до 3.")
+            continue  # просто повторяем цикл
 
         return lang_map[lang_code]
+
+
+if __name__ == "__main__":
+    selected_lang = select_language()
+    current_language = translations.get(selected_lang, {})
+    print(f"Выбран язык: {selected_lang}")
+    print("Переводы:", current_language)

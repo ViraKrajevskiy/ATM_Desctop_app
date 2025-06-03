@@ -12,9 +12,8 @@ class Role(BaseModel):
     BANK_WORKER = 'bankworker'
     USER = 'user'
 
-
 class DefaultUser(BaseModel):
-    choicefl = ForeignKeyField(Role, backref='role')
+    choicefl = ManyToManyField(Role, backref='role')
     id = AutoField()
     first_name = CharField()
     surname = CharField()

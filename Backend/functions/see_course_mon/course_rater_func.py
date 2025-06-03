@@ -42,7 +42,6 @@ def update_currency_rate(currency_pair: str, min_rate: float, max_rate: float):
 
         time.sleep(120)  # 2 минуты
 
-
 # Запуск потоков симуляции
 def start_currency_simulation():
     currency_pairs = {

@@ -1,7 +1,7 @@
 from Backend.functions.account.account import change_pin
 from Backend.functions.phone.connect_sms import connect_sms_phone
 from Backend.functions.phone.pay_phone import payphone
-from Backend.functions.see_course_mon.see_course import see_course_and_change
+from Backend.functions.see_course_mon.see_course_1 import see_course_and_change
 from Backend.functions.translate.TranslateMenu import *
 from Backend.functions.tranzactions.tranzactions import tranzactions
 
