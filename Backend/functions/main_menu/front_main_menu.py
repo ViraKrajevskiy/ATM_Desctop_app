@@ -145,7 +145,6 @@ class MyScreenManager(ScreenManager):
         self.get_screen('menu').set_language(self.language)
         self.current = 'menu'
 
-
 class BankingApp(App):
     def build(self):
         sm = MyScreenManager()

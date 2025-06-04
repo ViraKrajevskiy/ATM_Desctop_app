@@ -2,7 +2,7 @@
 
 from .main_menu.menu import *
 from .account.account import *
-from .login_logout.card_log import *
+
 from .login_logout.phone_log import *
 from .phone.connect_sms import *
 from .phone.pay_phone import *

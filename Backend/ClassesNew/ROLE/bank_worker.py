@@ -18,3 +18,4 @@ class BankWorker(BaseModel):
         return super().save(*args, **kwargs)
 
 
+ 

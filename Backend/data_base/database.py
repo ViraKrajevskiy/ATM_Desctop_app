@@ -1,6 +1,3 @@
-
-
-
 def create_all_tables():
     from Backend.ClassesNew.CASH.credit_cards import CreditCards, PhoneNumber
     from Backend.ClassesNew.CASH.money import Money, OtherRate
@@ -60,6 +57,7 @@ def main():
 
     for model in models:
         print_all_records(model)
+
 
 if __name__ == "__main__":
     main()
