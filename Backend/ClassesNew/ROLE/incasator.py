@@ -6,8 +6,8 @@ from Backend.data_base.core import BaseModel
 
 
 class Incasator(BaseModel):
-    login = CharField(unique=True)
-    password = CharField(unique=True)
+    login = CharField()
+    password = CharField()
     default_user = ForeignKeyField(DefaultUser, related_name='incasator')
     wallet = ManyToManyField(Wallet,backref='moen')
 

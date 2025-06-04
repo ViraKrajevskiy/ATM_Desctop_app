@@ -1,6 +1,8 @@
-from Backend.data_base.database import db
+
 from Backend.functions.see_course_mon.course_rater_func import CurrencyRate, start_currency_simulation
 from Backend.functions.translate.TranslateMenu import translations
+from Backend.data_base.core import db
+
 
 def get_latest_rate(currency_pair: str) -> float:
     rate_obj = (CurrencyRate
@@ -11,7 +13,6 @@ def get_latest_rate(currency_pair: str) -> float:
     return rate_obj.rate if rate_obj else None
 
 currency_simulation_started = False
-
 def see_course_and_change(lang):
 
     global currency_simulation_started
@@ -22,7 +23,12 @@ def see_course_and_change(lang):
 
     # Подключение к БД, если не подключена
     if db.is_closed():
-        db.connect()
+        try:
+            db.connect()
+        except Exception as e:
+            print(f"Ошибка подключения к базе данных: {e}")
+            return
+
 
     while True:
         data = translations[lang]
@@ -54,4 +60,4 @@ def see_course_and_change(lang):
                 print(data['InvalidOptionRange'])
 
         except ValueError:
-            print(data[''])
+            print(data['InvalidOption'])  # или подходящее сообщение, например: "Неверный ввод. Пожалуйста, введите число."

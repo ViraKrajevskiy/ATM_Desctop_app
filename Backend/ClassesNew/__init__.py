@@ -1,13 +1,13 @@
-
-from .ATM.atm import *
-
-from .CASH.credit_cards import *
-from .CASH.money import *
-from .CASH.permissions import *
-from .CASH.tranzaction import *
-from .CASH.wallet import *
-
-from .ROLE.bank_worker import *
-from .ROLE.base_user_m import *
-from .ROLE.incasator import *
-from .ROLE.user import *
+#
+# # from .ATM.atm import Atm
+#
+# from .CASH.credit_cards import CreditCards
+# from .CASH.money import Money
+# from .CASH.tranzaction import TranzactionMoney
+# from .CASH.wallet import Wallet
+#
+#
+# from .ROLE.bank_worker import BankWorker
+# from .ROLE.base_user_m import DefaultUser,Role
+# from .ROLE.incasator import Incasator
+# from .ROLE.user import User

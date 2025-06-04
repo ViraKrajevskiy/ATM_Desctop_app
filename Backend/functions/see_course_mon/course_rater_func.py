@@ -21,7 +21,6 @@ def update_currency_rate(currency_pair: str, min_rate: float, max_rate: float):
         new_rate = round(random.uniform(min_rate, max_rate), 2)
         now = datetime.now(timezone.utc)
 
-        # Добавление новой записи
         CurrencyRate.create(
             currency_pair=currency_pair,
             rate=new_rate,
@@ -30,12 +29,19 @@ def update_currency_rate(currency_pair: str, min_rate: float, max_rate: float):
 
         print(f"[{now}] {currency_pair} -> {new_rate}")
 
-        # Удаление старых записей, оставляя только 10 последних
-        query = (CurrencyRate
+        # Оставляем только 10 последних записей, удаляем остальные
+        rates = (CurrencyRate
                  .select()
                  .where(CurrencyRate.currency_pair == currency_pair)
                  .order_by(CurrencyRate.timestamp.desc()))
-        time.sleep(240)  # 2 минуты
+        if rates.count() > 10:
+            # Получаем записи, которые надо удалить (старее 10 последних)
+            to_delete = rates.offset(10)
+            ids_to_delete = [rate.id for rate in to_delete]
+            CurrencyRate.delete().where(CurrencyRate.id.in_(ids_to_delete)).execute()
+
+        time.sleep(240)
+# 2 минуты
 
 # Запуск потоков симуляции
 def start_currency_simulation():
@@ -57,13 +63,11 @@ def print_all_records():
     print()
 
 
-# Главная точка входа
 if __name__ == "__main__":
     if db.is_closed():
         db.connect()
 
-    db.create_tables([CurrencyRate])
-    start_currency_simulation()
+    start_currency_simulation()  # запускаем потоки симуляции
 
     try:
         while True:
@@ -71,3 +75,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Симуляция остановлена.")
         db.close()
+        

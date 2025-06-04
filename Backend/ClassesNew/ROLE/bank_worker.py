@@ -4,8 +4,8 @@ from Backend.ClassesNew.ROLE.base_user_m import Role, DefaultUser
 from Backend.data_base.core import BaseModel
 
 class BankWorker(BaseModel):
-    login = CharField(unique=True)
-    password = CharField(unique=True)
+    login = CharField()
+    password = CharField()
     enter = ManyToManyField(DefaultUser,backref='bankworker')
 
 

@@ -5,8 +5,8 @@ from Backend.data_base.core import BaseModel
 
 class Role(BaseModel):
     id = AutoField()
-    name = CharField(unique=True)
-    access = BooleanField(default=False)
+    name = CharField()
+    access = BooleanField()
 
     INCOSATOR = 'incosator'
     BANK_WORKER = 'bankworker'

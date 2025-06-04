@@ -1,6 +1,13 @@
-# from Backend.data_base.database import BaseModel
+from peewee import *
+from Backend.data_base import BaseModel
 
-#
-# class TranzactionMoney(BaseModel):
-#     money =
-#
+
+
+class TranzactionMoney(BaseModel):
+    from Backend.ClassesNew.ATM.atm import Atm
+    from Backend.ClassesNew.ROLE.user import User
+
+    money = AutoField()
+    payment_type = CharField()
+    pay_in = ManyToManyField(Atm, backref='do_these_bacnomat')  # Аналогично стоит проверить этот
+    User = ManyToManyField(User, backref='whopayed')
