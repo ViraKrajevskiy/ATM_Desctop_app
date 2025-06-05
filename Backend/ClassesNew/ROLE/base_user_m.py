@@ -1,3 +1,5 @@
+from enum import UNIQUE
+
 from peewee import *
 import datetime
 
@@ -5,7 +7,7 @@ from Backend.data_base.core import BaseModel
 
 class Role(BaseModel):
     id = AutoField()
-    name = CharField()
+    name = CharField(unique=True)
     access = BooleanField()
 
     INCOSATOR = 'incosator'
@@ -13,7 +15,7 @@ class Role(BaseModel):
     USER = 'user'
 
 class DefaultUser(BaseModel):
-    choicefl = ManyToManyField(Role, backref='role')
+    role = ForeignKeyField(Role, backref='users', on_delete='CASCADE')
     id = AutoField()
     first_name = CharField()
     surname = CharField()

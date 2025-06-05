@@ -9,7 +9,7 @@ class Money(BaseModel):
     date_made = DateTimeField()
 
 class OtherRate(BaseModel):
-    moeny_ids = AutoField()
+    id = AutoField()
     moeny_nominal = IntegerField()
     type = CharField()
     date_made = DateTimeField()
