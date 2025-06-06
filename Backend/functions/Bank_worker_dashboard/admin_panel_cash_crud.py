@@ -1,4 +1,4 @@
-import datetime
+
 
 from Backend.ClassesNew.CASH.credit_cards import CreditCards, PhoneNumber
 from Backend.data_base.core import db
@@ -13,8 +13,8 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.uix.checkbox import CheckBox
 
-
 from datetime import datetime
+
 
 from Backend.ClassesNew.CASH.money import Money
 
@@ -236,8 +236,7 @@ class CreditCardTable(Screen):
                         special_identificator=inp_spec_id.text,
                         bank_name=inp_bank_name.text,
                         card_type=inp_card_type.text,
-                        card_end_date=datetime.datetime.strptime(inp_end_date.text, '%Y-%m-%d').date()
-                    )
+                        card_end_date = datetime.strptime(inp_end_date.text, '%Y-%m-%d').date())
                     # Привязка номеров
                     for checkbox, phone in phone_checks:
                         if checkbox.active:

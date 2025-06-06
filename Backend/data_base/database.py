@@ -53,9 +53,12 @@ def main():
         CurrencyRate,
         TranzactionMoney
     ]
-
     for model in models:
         print_all_records(model)
+
+    Role.create_default_roles()
+
+
 
 
 if __name__ == "__main__":

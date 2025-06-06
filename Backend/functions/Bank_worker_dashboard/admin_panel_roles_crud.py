@@ -22,6 +22,14 @@ class DefaultUserTable(Screen):
     def on_pre_enter(self):
         self.build_table()
 
+    def show_error_popup(self, message):
+        popup = Popup(
+            title='Ошибка',
+            content=Label(text=message),
+            size_hint=(0.5, 0.3)
+        )
+        popup.open()
+
     def build_table(self):
         self.clear_widgets()
         layout = BoxLayout(orientation='vertical', padding=10)
@@ -112,6 +120,10 @@ class DefaultUserTable(Screen):
 
 
     def save_user(self, user, first_name, surname, last_name, role_name, popup):
+    # Проверка пустых полей и роли
+        if not first_name.strip() or not surname.strip() or not last_name.strip() or role_name == 'Выберите роль':
+            self.show_error_popup('Пожалуйста, заполните все поля и выберите роль.')
+            return
         try:
             with db.atomic():  # Transaction for consistency
                 role = Role.get(Role.name == role_name)
@@ -126,10 +138,10 @@ class DefaultUserTable(Screen):
                 else:
                 # Create new user
                     user = DefaultUser.create(
-                    first_name=first_name,
-                    surname=surname,
-                    last_name=last_name,
-                    role=role
+                        first_name=first_name,
+                        surname=surname,
+                        last_name=last_name,
+                        role=role
                 )
 
             # Handle role-specific records
@@ -137,14 +149,12 @@ class DefaultUserTable(Screen):
                     User.get_or_create(connect=user)
                 elif role.name == Role.INCOSATOR:
                     Incasator.get_or_create(
-                    default_user=user,
-                    defaults={'login': '', 'password': ''}
-                )
+                        default_user=user,
+                        defaults={'login': '', 'password': ''})
                 elif role.name == Role.BANK_WORKER:
                     BankWorker.get_or_create(
-                    user=user,
-                    defaults={'login': '', 'password': ''}
-                )
+                        user=user,
+                        defaults={'login': '', 'password': ''})
 
             popup.dismiss()
             self.build_table()
@@ -507,15 +517,25 @@ class IncasatorTable(Screen):
         popup.open()
 
     def save_user(self, user, first_name, surname, last_name, popup):
+        incasator_role = Role.get(Role.name == 'incasator')  # или нужная роль
         if user:
+        # обновление пользователя
             user.first_name = first_name
             user.surname = surname
             user.last_name = last_name
+            user.role_id = incasator_role.id  # не забудь установить роль
             user.save()
         else:
-            DefaultUser.create(first_name=first_name, surname=surname, last_name=last_name)
+        # создание пользователя
+            DefaultUser.create(
+                first_name=first_name,
+                surname=surname,
+                last_name=last_name,
+                role_id=incasator_role.id
+        )
         popup.dismiss()
         self.build_table()
+
 
     def delete_user(self, user):
         user.delete_instance()
