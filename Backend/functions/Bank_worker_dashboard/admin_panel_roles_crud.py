@@ -14,6 +14,9 @@ from Backend.ClassesNew.ROLE.base_user_m import DefaultUser, Role
 from Backend.ClassesNew.ROLE.bank_worker import BankWorker
 from Backend.ClassesNew.ROLE.incasator import Incasator
 from Backend.ClassesNew.ROLE.user import User
+from Backend.ClassesNew.CASH.wallet import Wallet
+
+from Backend.data_base.core import db
 
 class DefaultUserTable(Screen):
     def on_pre_enter(self):
@@ -109,34 +112,62 @@ class DefaultUserTable(Screen):
 
 
     def save_user(self, user, first_name, surname, last_name, role_name, popup):
-        role = Role.get(Role.name == role_name)
-        if user:
-            user.first_name = first_name
-            user.surname = surname
-            user.last_name = last_name
-            user.role = role
-            user.save()
-        else:
-            user = DefaultUser.create(first_name=first_name, surname=surname, last_name=last_name, role=role)
+        try:
+            with db.atomic():  # Transaction for consistency
+                role = Role.get(Role.name == role_name)
 
-    # Далее создаём или обновляем связанную таблицу в зависимости от роли
-        if role.name == 'User':
-            if not hasattr(user, 'user'):
-                User.create(connect_id=user.id)
-        elif role.name == 'Incasator':
-            if not hasattr(user, 'incasator'):
-                Incasator.create(login='', password='', default_user_id=user.id)
-        elif role.name == 'BankWorker':
-            if not hasattr(user, 'bankworker'):
-                BankWorker.create(login='', password='')
+                if user:
+                # Update existing user
+                    user.first_name = first_name
+                    user.surname = surname
+                    user.last_name = last_name
+                    user.role = role
+                    user.save()
+                else:
+                # Create new user
+                    user = DefaultUser.create(
+                    first_name=first_name,
+                    surname=surname,
+                    last_name=last_name,
+                    role=role
+                )
 
-        popup.dismiss()
-        self.build_table()
+            # Handle role-specific records
+                if role.name == Role.USER:
+                    User.get_or_create(connect=user)
+                elif role.name == Role.INCOSATOR:
+                    Incasator.get_or_create(
+                    default_user=user,
+                    defaults={'login': '', 'password': ''}
+                )
+                elif role.name == Role.BANK_WORKER:
+                    BankWorker.get_or_create(
+                    user=user,
+                    defaults={'login': '', 'password': ''}
+                )
+
+            popup.dismiss()
+            self.build_table()
+
+        except Exception as e:
+            self.show_error_popup(f'Ошибка сохранения: {str(e)}')
 
 
     def delete_user(self, user):
-        user.delete_instance()
-        self.build_table()
+        try:
+            with db.atomic():
+            # Delete role-specific record first
+                if user.role.name == Role.USER and hasattr(user, 'user'):
+                    user.user.delete_instance()
+                elif user.role.name == Role.INCOSATOR and hasattr(user, 'incasator'):
+                    user.incasator.delete_instance()
+                elif user.role.name == Role.BANK_WORKER and hasattr(user, 'bank_worker'):
+                    user.bank_worker.delete_instance()
+
+                user.delete_instance()
+            self.build_table()
+        except Exception as e:
+            self.show_error_popup(f'Ошибка удаления: {str(e)}')
 
 class RoleTable(Screen):
     def __init__(self, **kwargs):
@@ -365,19 +396,43 @@ class BankWorkerTable(Screen):
             self.show_error_popup('Логин и пароль не могут быть пустыми.')
             return
 
-        if worker:
-            worker.login = login
-            worker.password = password
-            worker.save()
-        else:
-            BankWorker.create(login=login, password=password)
-        popup.dismiss()
-        self.build_table()
+        try:
+            with db.atomic():  # Use transaction for data consistency
+                if worker:
+                # Update existing worker
+                    worker.login = login
+                    worker.password = password
+                    worker.save()
+                else:
+                # Create new worker with default user
+                    default_user = DefaultUser.create(
+                    first_name="Bank",
+                    surname="Worker",
+                    last_name=login,  # Using login as last name
+                    role=Role.get(name=Role.BANK_WORKER)
+                )
+
+                    BankWorker.create(
+                    login=login,
+                    password=password,
+                    user=default_user
+                )
+            popup.dismiss()
+            self.build_table()
+
+        except Exception as e:
+            self.show_error_popup(f'Ошибка сохранения: {str(e)}')
 
 
     def delete_worker(self, worker):
-        worker.delete_instance()
-        self.build_table()
+        try:
+            with db.atomic():
+                user = worker.user
+                worker.delete_instance()
+                user.delete_instance()  # Delete the associated user
+            self.build_table()
+        except Exception as e:
+            self.show_error_popup(f'Ошибка удаления: {str(e)}')
 
 class IncasatorTable(Screen):
     def on_pre_enter(self):
@@ -473,8 +528,10 @@ class UserTable(Screen):
 
     def build_table(self):
         self.clear_widgets()
+
         layout = BoxLayout(orientation='vertical', padding=10)
 
+        # Кнопки навигации
         btn_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
         btn_back = Button(text='Назад')
         btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'bank_dashboard'))
@@ -486,8 +543,9 @@ class UserTable(Screen):
         btn_box.add_widget(btn_add)
         layout.add_widget(btn_box)
 
+        # Таблица
         scroll = ScrollView()
-        grid = GridLayout(cols=5, size_hint_y=None, spacing=5)
+        grid = GridLayout(cols=5, size_hint_y=None, spacing=5, padding=5)
         grid.bind(minimum_height=grid.setter('height'))
 
         headers = ['ID', 'Connect DefaultUser ID', 'Wallet Count', 'Редакт.', 'Удалить']
@@ -497,9 +555,15 @@ class UserTable(Screen):
         for user in User.select():
             grid.add_widget(Label(text=str(user.id), size_hint_y=None, height=30))
             grid.add_widget(Label(text=str(user.connect.id) if user.connect else "None", size_hint_y=None, height=30))
-            wallets_count = user.wallet.count() if hasattr(user, 'wallet') else 0
+
+            # Надежный способ посчитать кошельки
+            try:
+                wallets_count = Wallet.select().where(Wallet.user == user).count()
+            except Exception:
+                wallets_count = 0
             grid.add_widget(Label(text=str(wallets_count), size_hint_y=None, height=30))
 
+            # FIX: используем default аргумент в lambda чтобы избежать late binding
             btn_edit = Button(text='✏️', size_hint_y=None, height=30)
             btn_edit.bind(on_press=lambda x, u=user: self.open_edit_popup(u))
             grid.add_widget(btn_edit)
@@ -512,7 +576,7 @@ class UserTable(Screen):
         layout.add_widget(scroll)
         self.add_widget(layout)
 
-    def open_add_popup(self, instance):
+    def open_add_popup(self, instance=None):
         self.show_user_popup()
 
     def open_edit_popup(self, user):
@@ -522,9 +586,11 @@ class UserTable(Screen):
         is_edit = user is not None
         popup_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
-        # Для связанного DefaultUser — можно сделать поле ввода ID (число)
-        inp_connect_id = TextInput(text=str(user.connect.id) if is_edit and user.connect else '', hint_text="Connect DefaultUser ID", input_filter='int')
-
+        inp_connect_id = TextInput(
+            text=str(user.connect.id) if is_edit and user.connect else '',
+            hint_text="Connect DefaultUser ID",
+            input_filter='int'
+        )
         popup_layout.add_widget(inp_connect_id)
 
         btn_save = Button(text='Сохранить')
@@ -538,9 +604,9 @@ class UserTable(Screen):
     def save_user(self, user, connect_id_text, popup):
         try:
             connect_id = int(connect_id_text)
-            connect_obj = DefaultUser.get(DefaultUser.id == connect_id)
+            connect_obj = DefaultUser.get_by_id(connect_id)
         except Exception:
-            # Не валидный connect_id
+            print(f"[!] Ошибка: некорректный connect_id: {connect_id_text}")
             return
 
         if user:
@@ -548,9 +614,14 @@ class UserTable(Screen):
             user.save()
         else:
             User.create(connect=connect_obj)
+
         popup.dismiss()
         self.build_table()
 
     def delete_user(self, user):
         user.delete_instance()
         self.build_table()
+
+
+
+

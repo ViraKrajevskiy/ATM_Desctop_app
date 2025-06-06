@@ -38,7 +38,7 @@ class LoginScreen(Screen):
 
     def verify_credentials(self, instance):
         self.manager.current = 'bank_dashboard'
-        #  заглушен логин
+        # 
         # login = self.login_input.text.strip()
         # password = self.password_input.text.strip()
         #

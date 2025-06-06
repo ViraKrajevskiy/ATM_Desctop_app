@@ -1,14 +1,11 @@
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.button import Button
-from kivy.uix.screenmanager import Screen
 
 from Backend.functions.Bank_worker_dashboard.admin_panel_roles_crud import DefaultUserTable, RoleTable, BankWorkerTable, \
     IncasatorTable, UserTable
 from Backend.functions.login_logout.login_admin import LoginScreen
-
+from Backend.functions.Bank_worker_dashboard.admin_panel_cash_crud import *
 
 class BankDashboard(Screen):
     def __init__(self, **kwargs):
@@ -30,11 +27,26 @@ class BankDashboard(Screen):
         btn_user = Button(text='Пользователи (User)', size_hint_y=None, height=50)
         btn_user.bind(on_press=lambda x: setattr(self.manager, 'current', 'user_table'))
 
+        # Новая кнопка для кредитных карт (исправлено название переменной)
+        btn_credit_cards = Button(text='Кредитные карты(CreditCards)', size_hint_y=None, height=50)
+        btn_credit_cards.bind(on_press=lambda x: setattr(self.manager, 'current', 'credit_cards_table'))
+
+        btn_phones = Button(text='Телефоны(PhoneNumbers)', size_hint_y=None, height=50)
+        btn_phones.bind(on_press=lambda x: setattr(self.manager, 'current', 'phones_table'))
+
+        btn_money = Button(text='Деньги (Money)', size_hint_y=None, height=50)
+        btn_money.bind(on_press=lambda x: setattr(self.manager, 'current', 'money_rate'))
+
+
+
         layout.add_widget(btn_defaultuser)
         layout.add_widget(btn_role)
         layout.add_widget(btn_bankworker)
         layout.add_widget(btn_incasator)
         layout.add_widget(btn_user)
+        layout.add_widget(btn_credit_cards)  # Исправлено на btn_credit_cards
+        layout.add_widget(btn_phones)
+        layout.add_widget(btn_money)
 
         self.add_widget(layout)
 
@@ -44,12 +56,14 @@ class MyApp(App):
         self.sm = ScreenManager()
         self.sm.add_widget(LoginScreen(name="login"))
         self.sm.add_widget(BankDashboard(name="bank_dashboard"))
-
         self.sm.add_widget(DefaultUserTable(name='defaultuser_table'))
         self.sm.add_widget(RoleTable(name='role_table'))
         self.sm.add_widget(BankWorkerTable(name='bankworker_table'))
         self.sm.add_widget(IncasatorTable(name='incasator_table'))
         self.sm.add_widget(UserTable(name='user_table'))
+        self.sm.add_widget(PhoneNumberTable(name='phones_table'))
+        self.sm.add_widget(CreditCardTable(name='credit_cards_table'))
+        self.sm.add_widget(MoneyManagementScreen(name='money_rate' ))
 
         Window.bind(on_key_down=self.on_key_down)
         return self.sm
