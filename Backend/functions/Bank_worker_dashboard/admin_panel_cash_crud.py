@@ -144,6 +144,9 @@ class PhoneNumberTable(Screen):
         popup.open()
 
 
+from functools import partial
+from datetime import datetime
+
 class CreditCardTable(Screen):
     def on_pre_enter(self):
         self.build_table()
@@ -164,10 +167,10 @@ class CreditCardTable(Screen):
         layout.add_widget(top)
 
         scroll = ScrollView()
-        grid = GridLayout(cols=6, size_hint_y=None)
+        grid = GridLayout(cols=7, size_hint_y=None)  # теперь 7 колонок (ID, Number, Balance, Phones, Редактировать, Удалить)
         grid.bind(minimum_height=grid.setter('height'))
 
-        headers = ['ID', 'Card Number', 'Balance', 'Phone Numbers', 'Удалить']
+        headers = ['ID', 'Card Number', 'Balance', 'Phone Numbers', 'Редактировать', 'Удалить']
         for h in headers:
             grid.add_widget(Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30))
 
@@ -175,12 +178,15 @@ class CreditCardTable(Screen):
             grid.add_widget(Label(text=str(card.id)))
             grid.add_widget(Label(text=str(card.card_number)))
             grid.add_widget(Label(text=str(card.balance)))
-            # Список номеров, связанных с картой
             phones = ", ".join(p.phone_number for p in card.phone_field)
             grid.add_widget(Label(text=phones))
 
+            btn_edit = Button(text="✏️", size_hint_y=None, height=30)
+            btn_edit.bind(on_press=partial(self.open_edit_popup, card.id))
+            grid.add_widget(btn_edit)
+
             btn_del = Button(text="🗑️", size_hint_y=None, height=30)
-            btn_del.bind(on_press=lambda x, c=card: self.delete_card(c))
+            btn_del.bind(on_press=partial(self.delete_card, card.id))
             grid.add_widget(btn_del)
 
         scroll.add_widget(grid)
@@ -190,26 +196,39 @@ class CreditCardTable(Screen):
     def open_add_popup(self, instance):
         self.show_card_popup()
 
-    def show_card_popup(self):
+    def open_edit_popup(self, card_id, instance):
+        card = CreditCards.get_by_id(card_id)
+        self.show_card_popup(card)
+
+    def show_card_popup(self, card=None):
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
         inp_card_number = TextInput(hint_text='Номер карты', input_filter='int')
         inp_balance = TextInput(hint_text='Баланс', input_filter='int')
-        inp_security = TextInput(hint_text='CVV', input_filter='int')
-        inp_spec_id = TextInput(hint_text='Спец. идентификатор')
+        inp_password = TextInput(hint_text='Пароль', input_filter='int')  # security_code
+        inp_cvv = TextInput(hint_text='CVV')  # special_identificator
         inp_bank_name = TextInput(hint_text='Название банка')
         inp_card_type = TextInput(hint_text='Тип карты')
         inp_end_date = TextInput(hint_text='Дата окончания (YYYY-MM-DD)')
 
+        # Если редактируем - заполнить поля значениями
+        if card:
+            inp_card_number.text = str(card.card_number)
+            inp_balance.text = str(card.balance)
+            inp_password.text = str(card.security_code)
+            inp_cvv.text = card.special_identificator
+            inp_bank_name.text = card.bank_name
+            inp_card_type.text = card.card_type
+            inp_end_date.text = card.card_end_date.strftime('%Y-%m-%d') if card.card_end_date else ''
+
         layout.add_widget(inp_card_number)
         layout.add_widget(inp_balance)
-        layout.add_widget(inp_security)
-        layout.add_widget(inp_spec_id)
+        layout.add_widget(inp_password)
+        layout.add_widget(inp_cvv)
         layout.add_widget(inp_bank_name)
         layout.add_widget(inp_card_type)
         layout.add_widget(inp_end_date)
 
-        # Список номеров (чекбоксы)
         phone_checks = []
         for phone in PhoneNumber.select():
             hbox = BoxLayout(size_hint_y=None, height=30)
@@ -220,27 +239,50 @@ class CreditCardTable(Screen):
             layout.add_widget(hbox)
             phone_checks.append((checkbox, phone))
 
+            # Отметить уже привязанные номера при редактировании
+            if card and phone in card.phone_field:
+                checkbox.active = True
+
         btn_save = Button(text='Сохранить')
         layout.add_widget(btn_save)
 
-        popup = Popup(title='Добавить карту', content=layout, size_hint=(0.7, 0.9))
+        title = 'Редактировать карту' if card else 'Добавить карту'
+        popup = Popup(title=title, content=layout, size_hint=(0.7, 0.9))
         popup.open()
 
         def save_card(instance):
             try:
                 with db.atomic():
-                    card = CreditCards.create(
-                        card_number=int(inp_card_number.text),
-                        balance=int(inp_balance.text),
-                        security_code=int(inp_security.text),
-                        special_identificator=inp_spec_id.text,
-                        bank_name=inp_bank_name.text,
-                        card_type=inp_card_type.text,
-                        card_end_date = datetime.strptime(inp_end_date.text, '%Y-%m-%d').date())
-                    # Привязка номеров
-                    for checkbox, phone in phone_checks:
-                        if checkbox.active:
-                            card.phone_field.add(phone)
+                    if card:
+                        # Обновление существующей карты
+                        card.card_number = int(inp_card_number.text)
+                        card.balance = int(inp_balance.text)
+                        card.security_code = int(inp_password.text)
+                        card.special_identificator = inp_cvv.text
+                        card.bank_name = inp_bank_name.text
+                        card.card_type = inp_card_type.text
+                        card.card_end_date = datetime.strptime(inp_end_date.text, '%Y-%m-%d').date()
+                        card.save()
+
+                        # Обновление связей с номерами
+                        card.phone_field.clear()
+                        for checkbox, phone in phone_checks:
+                            if checkbox.active:
+                                card.phone_field.add(phone)
+
+                    else:
+                        # Создание новой карты
+                        new_card = CreditCards.create(
+                            card_number=int(inp_card_number.text),
+                            balance=int(inp_balance.text),
+                            security_code=int(inp_password.text),
+                            special_identificator=inp_cvv.text,
+                            bank_name=inp_bank_name.text,
+                            card_type=inp_card_type.text,
+                            card_end_date=datetime.strptime(inp_end_date.text, '%Y-%m-%d').date())
+                        for checkbox, phone in phone_checks:
+                            if checkbox.active:
+                                new_card.phone_field.add(phone)
 
                 popup.dismiss()
                 self.build_table()
@@ -249,9 +291,10 @@ class CreditCardTable(Screen):
 
         btn_save.bind(on_press=save_card)
 
-    def delete_card(self, card):
+    def delete_card(self, card_id, *args):
         try:
             with db.atomic():
+                card = CreditCards.get_by_id(card_id)
                 card.delete_instance(recursive=True)
             self.build_table()
         except Exception as e:
@@ -260,10 +303,7 @@ class CreditCardTable(Screen):
     def show_error_popup(self, msg):
         popup = Popup(title='Ошибка', content=Label(text=msg), size_hint=(0.5, 0.3))
         popup.open()
-
-
-
-
+        
 class MoneyManagementScreen(Screen):
     def on_pre_enter(self):
         self.build_table()

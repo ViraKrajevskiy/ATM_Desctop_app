@@ -50,7 +50,11 @@
       "USD -> SUM",
       "EUR -> SUM",
       "RUB -> SUM"
-    ]
+    ],
+    "ExchangeTitle": "Currency Exchange",
+    "ExchangeMethod": "Select exchange method:",
+    "ExchangeCard": "Exchange via Card",
+    "ExchangeCash": "Exchange Cash"
   },
   "ru": {
     "greeting": "Добро пожаловать!",
@@ -103,7 +107,11 @@
       "Доллар -> Сум",
       "Евро -> Сум",
       "Рубль -> Сум"
-    ]
+    ],
+    "ExchangeTitle": "Обмен валюты",
+    "ExchangeMethod": "Выберите способ обмена:",
+    "ExchangeCard": "Обмен по карте",
+    "ExchangeCash": "Обмен наличными"
   },
   "uz": {
     "greeting": "Xush kelibsiz!",
@@ -155,6 +163,10 @@
       "AQSH dollari -> So'm",
       "Yevro -> So'm",
       "Rubl -> So'm"
-    ]
+    ],
+    "ExchangeTitle": "Valyuta almashinuvi",
+    "ExchangeMethod": "Almashinuv usulini tanlang:",
+    "ExchangeCard": "Karta orqali almashish",
+    "ExchangeCash": "Naqd pul almashinuvi"
   }
 }

@@ -445,13 +445,38 @@ class BankWorkerTable(Screen):
             self.show_error_popup(f'Ошибка удаления: {str(e)}')
 
 class IncasatorTable(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # сюда будем сохранять введённый фильтр по роли
+        self.filter_text = ''
+
     def on_pre_enter(self):
         self.build_table()
 
     def build_table(self):
         self.clear_widgets()
-        layout = BoxLayout(orientation='vertical', padding=10)
+        root_layout = BoxLayout(orientation='vertical', padding=10)
 
+        # ─── Секция «Фильтр по роли» ────────────────────────────────────────────
+        filter_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
+
+        # В каждый раз создаём новый локальный TextInput и заполняем его text из self.filter_text
+        filter_input = TextInput(
+            text=self.filter_text,
+            hint_text="Фильтр по роли (пример: incasator)",
+            multiline=False
+        )
+
+        btn_apply = Button(text='Применить', size_hint_x=None, width=100)
+        # При нажатии «Применить» передаём введённый текст в on_apply_filter
+        btn_apply.bind(on_press=lambda inst: self.on_apply_filter(filter_input.text))
+
+        filter_box.add_widget(filter_input)
+        filter_box.add_widget(btn_apply)
+        root_layout.add_widget(filter_box)
+        # ───────────────────────────────────────────────────────────────────────
+
+        # ─── Панель кнопок «Назад» и «Добавить» ───────────────────────────────────
         btn_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
         btn_back = Button(text='Назад')
         btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'bank_dashboard'))
@@ -461,36 +486,63 @@ class IncasatorTable(Screen):
 
         btn_box.add_widget(btn_back)
         btn_box.add_widget(btn_add)
-        layout.add_widget(btn_box)
+        root_layout.add_widget(btn_box)
+        # ───────────────────────────────────────────────────────────────────────
 
+        # ─── Таблица ─────────────────────────────────────────────────────────────
         scroll = ScrollView()
-        grid = GridLayout(cols=7, size_hint_y=None, spacing=5)
+        grid = GridLayout(cols=8, size_hint_y=None, spacing=5, padding=5)
         grid.bind(minimum_height=grid.setter('height'))
 
-        headers = ['ID', 'First Name', 'Surname', 'Last Name', 'Created At', 'Редакт.', 'Удалить']
+        # Заголовки столбцов
+        headers = ['ID', 'First Name', 'Surname', 'Last Name', 'Role', 'Created At', 'Редакт.', 'Удалить']
         for h in headers:
-            grid.add_widget(Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30))
+            lbl = Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30)
+            grid.add_widget(lbl)
 
-        for user in DefaultUser.select():
+        # Подготовим запрос к DefaultUser с учётом фильтра:
+        query = DefaultUser.select(DefaultUser, Role).join(Role, on=(DefaultUser.role_id == Role.id))
+        if self.filter_text.strip():
+            ft_lower = self.filter_text.strip().lower()
+            query = query.where(Role.name ** f'%{ft_lower}%')
+
+        for user in query:
+            # ID
             grid.add_widget(Label(text=str(user.id), size_hint_y=None, height=30))
-            grid.add_widget(Label(text=user.first_name, size_hint_y=None, height=30))
-            grid.add_widget(Label(text=user.surname, size_hint_y=None, height=30))
-            grid.add_widget(Label(text=user.last_name, size_hint_y=None, height=30))
+            # First Name
+            grid.add_widget(Label(text=user.first_name or '', size_hint_y=None, height=30))
+            # Surname
+            grid.add_widget(Label(text=user.surname or '', size_hint_y=None, height=30))
+            # Last Name
+            grid.add_widget(Label(text=user.last_name or '', size_hint_y=None, height=30))
+            # Role (имя роли)
+            role_name = user.role.name if user.role else "None"
+            grid.add_widget(Label(text=role_name, size_hint_y=None, height=30))
+            # Created At
             grid.add_widget(Label(text=str(user.created_at), size_hint_y=None, height=30))
 
+            # Кнопка «Редактировать»
             btn_edit = Button(text='✏️', size_hint_y=None, height=30)
             btn_edit.bind(on_press=lambda x, u=user: self.open_edit_popup(u))
             grid.add_widget(btn_edit)
 
+            # Кнопка «Удалить»
             btn_del = Button(text='🗑️', size_hint_y=None, height=30)
             btn_del.bind(on_press=lambda x, u=user: self.delete_user(u))
             grid.add_widget(btn_del)
 
         scroll.add_widget(grid)
-        layout.add_widget(scroll)
-        self.add_widget(layout)
+        root_layout.add_widget(scroll)
+        # ───────────────────────────────────────────────────────────────────────
 
-    def open_add_popup(self, instance):
+        self.add_widget(root_layout)
+
+    def on_apply_filter(self, new_text):
+        # Сохраняем введённое значение фильтра и перестраиваем таблицу
+        self.filter_text = new_text
+        self.build_table()
+
+    def open_add_popup(self, instance=None):
         self.show_user_popup()
 
     def open_edit_popup(self, user):
@@ -504,54 +556,110 @@ class IncasatorTable(Screen):
         inp_surname = TextInput(text=user.surname if is_edit else '', hint_text="Фамилия")
         inp_last = TextInput(text=user.last_name if is_edit else '', hint_text="Отчество")
 
+        # Дропдаун или TextInput для роли
+        inp_role = TextInput(
+            text=user.role.name if is_edit and user.role else '',
+            hint_text="Название роли (например, incasator)"
+        )
+
         popup_layout.add_widget(inp_first)
         popup_layout.add_widget(inp_surname)
         popup_layout.add_widget(inp_last)
+        popup_layout.add_widget(inp_role)
 
         btn_save = Button(text='Сохранить')
         popup_layout.add_widget(btn_save)
 
-        popup = Popup(title='Редактирование' if is_edit else 'Добавление',
-                      content=popup_layout, size_hint=(0.6, 0.5))
-        btn_save.bind(on_press=lambda x: self.save_user(user, inp_first.text, inp_surname.text, inp_last.text, popup))
+        popup_title = 'Редактирование инкассатора' if is_edit else 'Добавление инкассатора'
+        popup = Popup(title=popup_title, content=popup_layout, size_hint=(0.7, 0.6))
+        btn_save.bind(on_press=lambda x: self.save_user(
+                          user, inp_first.text, inp_surname.text, inp_last.text, inp_role.text, popup
+                      ))
         popup.open()
 
-    def save_user(self, user, first_name, surname, last_name, popup):
-        incasator_role = Role.get(Role.name == 'incasator')  # или нужная роль
+    def save_user(self, user, first_name, surname, last_name, role_text, popup):
+        # Ищем или создаём роль по имени role_text
+        role_name = role_text.strip()
+        if not role_name:
+            print("[!] Ошибка: роль не указана")
+            return
+
+        # Находим существующую роль (регистр игнорируется)
+        role_obj = Role.get_or_none(Role.name ** role_name.lower())
+        if not role_obj:
+            role_obj = Role.create(name=role_name)
+
         if user:
-        # обновление пользователя
             user.first_name = first_name
             user.surname = surname
             user.last_name = last_name
-            user.role_id = incasator_role.id  # не забудь установить роль
+            user.role_id = role_obj.id
             user.save()
         else:
-        # создание пользователя
             DefaultUser.create(
                 first_name=first_name,
                 surname=surname,
                 last_name=last_name,
-                role_id=incasator_role.id
-        )
+                role_id=role_obj.id
+            )
+
         popup.dismiss()
         self.build_table()
-
 
     def delete_user(self, user):
         user.delete_instance()
         self.build_table()
 
 
+
+
+from kivy.uix.screenmanager import Screen
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.button import Button
+from kivy.uix.popup import Popup
+from kivy.uix.textinput import TextInput
+
+from Backend.ClassesNew.ROLE.user import User
+from Backend.ClassesNew.ROLE.base_user_m import DefaultUser
+from Backend.ClassesNew.CASH.wallet import Wallet
+
+
 class UserTable(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Храним текст фильтра между перестройками таблицы
+        self.filter_text = ''
+
     def on_pre_enter(self):
+        # При входе на экран строим таблицу
         self.build_table()
 
     def build_table(self):
         self.clear_widgets()
+        root_layout = BoxLayout(orientation='vertical', padding=10)
 
-        layout = BoxLayout(orientation='vertical', padding=10)
+        # ─── Секция «Фильтр» ───────────────────────────────────────────────────────
+        filter_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
 
-        # Кнопки навигации
+        # Каждый раз создаём новый TextInput, сразу подставляя в него прошлый текст фильтра
+        filter_input = TextInput(
+            text=self.filter_text,
+            hint_text="Фильтр по Connect DefaultUser ID",
+            multiline=False
+        )
+
+        btn_apply = Button(text="Применить", size_hint_x=None, width=100)
+        btn_apply.bind(on_press=lambda inst: self.on_apply_filter(filter_input.text))
+
+        filter_box.add_widget(filter_input)
+        filter_box.add_widget(btn_apply)
+        root_layout.add_widget(filter_box)
+        # ──────────────────────────────────────────────────────────────────────────
+
+        # ─── Кнопки навигации («Назад» и «Добавить») ──────────────────────────────
         btn_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
         btn_back = Button(text='Назад')
         btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'bank_dashboard'))
@@ -561,29 +669,45 @@ class UserTable(Screen):
 
         btn_box.add_widget(btn_back)
         btn_box.add_widget(btn_add)
-        layout.add_widget(btn_box)
+        root_layout.add_widget(btn_box)
+        # ──────────────────────────────────────────────────────────────────────────
 
-        # Таблица
+        # ─── Основная таблица ───────────────────────────────────────────────────────
         scroll = ScrollView()
         grid = GridLayout(cols=5, size_hint_y=None, spacing=5, padding=5)
         grid.bind(minimum_height=grid.setter('height'))
 
+        # Заголовки столбцов
         headers = ['ID', 'Connect DefaultUser ID', 'Wallet Count', 'Редакт.', 'Удалить']
         for h in headers:
-            grid.add_widget(Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30))
+            lbl = Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30)
+            grid.add_widget(lbl)
 
-        for user in User.select():
+        # Подготавливаем выборку с учётом фильтра
+        query = User.select()
+        if self.filter_text.strip():
+            try:
+                fid = int(self.filter_text.strip())
+                query = query.where(User.connect == fid)
+            except ValueError:
+                # Если ввели не число, оставляем без фильтрации
+                pass
+
+        # Заполняем таблицу записями
+        for user in query:
             grid.add_widget(Label(text=str(user.id), size_hint_y=None, height=30))
-            grid.add_widget(Label(text=str(user.connect.id) if user.connect else "None", size_hint_y=None, height=30))
+            grid.add_widget(Label(
+                                text=str(user.connect.id) if user.connect else "None",
+                                size_hint_y=None, height=30
+                            ))
 
-            # Надежный способ посчитать кошельки
+            # Подсчёт кошельков пользователя
             try:
                 wallets_count = Wallet.select().where(Wallet.user == user).count()
             except Exception:
                 wallets_count = 0
             grid.add_widget(Label(text=str(wallets_count), size_hint_y=None, height=30))
 
-            # FIX: используем default аргумент в lambda чтобы избежать late binding
             btn_edit = Button(text='✏️', size_hint_y=None, height=30)
             btn_edit.bind(on_press=lambda x, u=user: self.open_edit_popup(u))
             grid.add_widget(btn_edit)
@@ -593,8 +717,15 @@ class UserTable(Screen):
             grid.add_widget(btn_del)
 
         scroll.add_widget(grid)
-        layout.add_widget(scroll)
-        self.add_widget(layout)
+        root_layout.add_widget(scroll)
+        # ──────────────────────────────────────────────────────────────────────────
+
+        self.add_widget(root_layout)
+
+    def on_apply_filter(self, new_text):
+        # Сохраняем введённое значение фильтра и перестраиваем таблицу
+        self.filter_text = new_text
+        self.build_table()
 
     def open_add_popup(self, instance=None):
         self.show_user_popup()
@@ -616,8 +747,11 @@ class UserTable(Screen):
         btn_save = Button(text='Сохранить')
         popup_layout.add_widget(btn_save)
 
-        popup = Popup(title='Редактирование' if is_edit else 'Добавление',
-                      content=popup_layout, size_hint=(0.6, 0.4))
+        popup = Popup(
+            title='Редактирование' if is_edit else 'Добавление',
+            content=popup_layout,
+            size_hint=(0.6, 0.4)
+        )
         btn_save.bind(on_press=lambda x: self.save_user(user, inp_connect_id.text, popup))
         popup.open()
 
@@ -641,7 +775,3 @@ class UserTable(Screen):
     def delete_user(self, user):
         user.delete_instance()
         self.build_table()
-
-
-
-

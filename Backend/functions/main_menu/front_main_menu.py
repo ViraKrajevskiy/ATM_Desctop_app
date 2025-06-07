@@ -1,12 +1,9 @@
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
+import os
 from kivy.graphics import Color, RoundedRectangle
-import json
-
+from Backend.functions.changes_phone_pin.change_pin import ChangePinLoginScreen, ChangePinScreen
 from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
+from Backend.functions.translate.TranslateMenu import translations
+from Backend.functions.Bank_worker_dashboard.main_func import *
 
 
 class RoundedButton(Button):
@@ -16,7 +13,7 @@ class RoundedButton(Button):
         self.background_down = ''
         self.background_color = (0, 0, 0, 0)
         with self.canvas.before:
-            Color(0.2, 0.5, 0.7, 1)  # Цвет кнопки
+            Color(0.2, 0.5, 0.7, 1)
             self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[15])
         self.bind(pos=self.update_rect, size=self.update_rect)
 
@@ -24,19 +21,17 @@ class RoundedButton(Button):
         self.rect.pos = self.pos
         self.rect.size = self.size
 
-
 class ThemedBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         with self.canvas.before:
-            Color(0.6078, 0.7882, 0.8117, 1)  # RGB(155, 201, 207)
+            Color(0.6078, 0.7882, 0.8117, 1)
             self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
         self.bind(pos=self.update_rect, size=self.update_rect)
 
     def update_rect(self, *args):
         self.rect.pos = self.pos
         self.rect.size = self.size
-
 
 class LanguageScreen(Screen):
     def __init__(self, **kwargs):
@@ -59,17 +54,45 @@ class LanguageScreen(Screen):
         self.manager.current = 'menu'
 
 
-# Load translations
-with open('translation.json', "r", encoding="utf-8") as f:
-    translations = json.load(f)
+
+current_dir = os.path.dirname(os.path.abspath(__file__))  # папка скрипта
+file_path = os.path.join(current_dir, 'translation.json')
+
+with open(file_path, 'r', encoding='utf-8') as f:
+    data = f.read()
+
 
 class MainMenuScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self._keyboard = None
         self.layout = ThemedBoxLayout(orientation='vertical', spacing=10, padding=20)
         self.label = Label(font_size=24)
         self.layout.add_widget(self.label)
         self.add_widget(self.layout)
+
+    def on_enter(self):
+        # Активируем клавиатуру при входе на экран
+        self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+        self._keyboard.bind(on_key_down=self.on_key_down)
+
+    def on_leave(self):
+        # Деактивируем клавиатуру при выходе с экрана
+        if self._keyboard:
+            self._keyboard.unbind(on_key_down=self.on_key_down)
+            self._keyboard = None
+
+    def _keyboard_closed(self):
+        if self._keyboard:
+            self._keyboard.unbind(on_key_down=self.on_key_down)
+            self._keyboard = None
+
+    def on_key_down(self, keyboard, keycode, text, modifiers):
+        # Обработка Alt+1 для перехода на экран login
+        if 'alt' in modifiers and (text == '1' or keycode[1] == '1'):
+            self.manager.current = 'change_pins'
+            return True
+        return False
 
     def set_language(self, lang):
         self.lang = lang
@@ -91,8 +114,6 @@ class MainMenuScreen(Screen):
             6: 'language',
         }
 
-
-
         for idx, item in enumerate(self.data['MenuOption']):
             btn = RoundedButton(text=item, size_hint_y=None, height=50)
             if idx in screen_map:
@@ -102,36 +123,6 @@ class MainMenuScreen(Screen):
             self.layout.add_widget(btn)
 
 
-class InfoScreen(Screen):
-    def __init__(self, text_key, **kwargs):
-        super().__init__(**kwargs)
-        self.text_key = text_key
-
-        self.label = Label(
-            text="",
-            font_size=20,
-            halign='center',
-            valign='middle',
-            size_hint_y=None
-        )
-        self.label.bind(texture_size=self.update_label_height)
-
-        back_btn = Button(text="Back", size_hint_y=None, height=50)
-        back_btn.bind(on_press=lambda x: self.manager.go_to_menu())
-
-        self.layout = ThemedBoxLayout(orientation='vertical', padding=20, spacing=10)
-        self.layout.add_widget(self.label)
-        self.layout.add_widget(back_btn)
-        self.add_widget(self.layout)
-
-    def update_label_height(self, *args):
-        self.label.height = self.label.texture_size[1]
-
-    def on_enter(self):
-        lang = self.manager.language
-        text = translations[lang].get(self.text_key, "No content.")
-        self.label.text = text
-        self.label.text_size = (self.width - 40, None)  # ширина с отступами
 
 class MyScreenManager(ScreenManager):
     def __init__(self, **kwargs):
@@ -145,19 +136,51 @@ class MyScreenManager(ScreenManager):
         self.get_screen('menu').set_language(self.language)
         self.current = 'menu'
 
+
+class InfoScreen(Screen):
+    def __init__(self, text_key='', **kwargs):
+        super().__init__(**kwargs)
+        self.text_key = text_key
+        self.layout = BoxLayout(orientation='vertical', padding=20, spacing=10)
+        self.label = Label(text='', font_size=20)
+        self.layout.add_widget(self.label)
+        self.add_widget(self.layout)
+
+    def on_pre_enter(self):
+        # Например, получение текста из словаря translations
+        # В вашем коде должен быть словарь translations, например:
+        # self.manager.language - текущий язык
+        lang = getattr(self.manager, 'language', 'en')
+        text = translations.get(lang, {}).get(self.text_key, 'No info available')
+        self.label.text = text
+
 class BankingApp(App):
     def build(self):
         sm = MyScreenManager()
         sm.add_widget(LanguageScreen(name='language'))
         sm.add_widget(MainMenuScreen(name='menu'))
         sm.add_widget(InfoScreen(name='about', text_key='AboutUs'))
-        sm.add_widget(CurrencyScreen(name='currency'))  # имя соответствует screen_map
-        sm.add_widget(InfoScreen(name='change_pin', text_key='ChangePin'))
+        sm.add_widget(CurrencyScreen(name='currency'))
+        sm.add_widget(LoginScreen(name='change_pins', text_key='ChangePin'))
+
+        # Экран авторизации перед сменой PIN
+        sm.add_widget(ChangePinLoginScreen(name='change_pin'))
+        # Непосредственный экран «Смена PIN»
+        sm.add_widget(ChangePinScreen(name='changes_pin'))
+
         sm.add_widget(InfoScreen(name='transactions', text_key='Transactions'))
         sm.add_widget(InfoScreen(name='connect_sms', text_key='ConnectSMS'))
-        sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))  # Заглушка
+        sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))
+        sm.add_widget(BankDashboard(name='bank_dashboard'))
+        sm.add_widget(DefaultUserTable(name='defaultuser_table'))
+        sm.add_widget(RoleTable(name='role_table'))
+        sm.add_widget(IncasatorTable(name='incasator_table'))
+        sm.add_widget(UserTable(name='user_table'))
+        sm.add_widget(PhoneNumberTable(name='phones_table'))
+        sm.add_widget(CreditCardTable(name='credit_cards_table'))
+        sm.add_widget(MoneyManagementScreen(name='money_rate' ))
+        sm.add_widget(BankWorkerTable(name='bankworker_table'))
         return sm
-
 
 if __name__ == '__main__':
     BankingApp().run()

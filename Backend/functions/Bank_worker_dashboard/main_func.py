@@ -7,6 +7,7 @@ from Backend.functions.Bank_worker_dashboard.admin_panel_roles_crud import Defau
 from Backend.functions.login_logout.login_admin import LoginScreen
 from Backend.functions.Bank_worker_dashboard.admin_panel_cash_crud import *
 
+
 class BankDashboard(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -37,7 +38,8 @@ class BankDashboard(Screen):
         btn_money = Button(text='Деньги (Money)', size_hint_y=None, height=50)
         btn_money.bind(on_press=lambda x: setattr(self.manager, 'current', 'money_rate'))
 
-
+        btn_logout = Button(text='Выйти', size_hint_y=None, height=50)
+        btn_logout.bind(on_press=lambda x: setattr(self.manager, 'current', 'language'))
 
         layout.add_widget(btn_defaultuser)
         layout.add_widget(btn_role)
@@ -47,6 +49,8 @@ class BankDashboard(Screen):
         layout.add_widget(btn_credit_cards)  # Исправлено на btn_credit_cards
         layout.add_widget(btn_phones)
         layout.add_widget(btn_money)
+        layout.add_widget(btn_logout)
+
 
         self.add_widget(layout)
 

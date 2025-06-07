@@ -4,10 +4,11 @@ from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.graphics import Color, Rectangle
-
+from kivy.properties import StringProperty
 from Backend.ClassesNew.ROLE.bank_worker import BankWorker
 
 class LoginScreen(Screen):
+    text_key = StringProperty()
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
