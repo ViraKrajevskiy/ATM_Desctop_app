@@ -7,4 +7,4 @@ class Atm(BaseModel):
     from Backend.ClassesNew.CASH.wallet import Wallet
     id = AutoField()
     location = CharField()
-    Money = ManyToManyField(Wallet,backref='eusde')
+    wallet = ForeignKeyField(Wallet,backref='atms',on_delete='CASCADE')

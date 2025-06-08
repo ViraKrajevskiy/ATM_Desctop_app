@@ -79,8 +79,7 @@ class MyApp(App):
         self.sm.add_widget(CreditCardTable(name='credit_cards_table'))
         self.sm.add_widget(MoneyManagementScreen(name='money_rate' ))
         self.sm.add_widget(AtmManagementScreen(name='atm_table'))
-
-
+        
         Window.bind(on_key_down=self.on_key_down)
         return self.sm
 

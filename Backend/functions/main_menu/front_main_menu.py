@@ -3,6 +3,8 @@ from kivy.graphics import Color, RoundedRectangle
 
 from Backend.functions.changes_phone_pin.change_phone import PhoneLogin, ChangePhoneScreen
 from Backend.functions.changes_phone_pin.change_pin import ChangePinLoginScreen, ChangePinScreen
+from Backend.functions.main_menu.about_page import AboutScreen
+from Backend.functions.phone.pay_hone_number.pay_phone import TopUpChoiceScreen
 from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
 from Backend.functions.translate.TranslateMenu import translations
 from Backend.functions.Bank_worker_dashboard.main_func import *
@@ -138,7 +140,6 @@ class MyScreenManager(ScreenManager):
         self.get_screen('menu').set_language(self.language)
         self.current = 'menu'
 
-
 class InfoScreen(Screen):
     def __init__(self, text_key='', **kwargs):
         super().__init__(**kwargs)
@@ -149,9 +150,7 @@ class InfoScreen(Screen):
         self.add_widget(self.layout)
 
     def on_pre_enter(self):
-        # Например, получение текста из словаря translations
-        # В вашем коде должен быть словарь translations, например:
-        # self.manager.language - текущий язык
+        # получение текста из словаря translations
         lang = getattr(self.manager, 'language', 'en')
         text = translations.get(lang, {}).get(self.text_key, 'No info available')
         self.label.text = text
@@ -161,9 +160,9 @@ class BankingApp(App):
         sm = MyScreenManager()
         sm.add_widget(LanguageScreen(name='language'))
         sm.add_widget(MainMenuScreen(name='menu'))
-        sm.add_widget(InfoScreen(name='about', text_key='AboutUs'))
         sm.add_widget(CurrencyScreen(name='currency'))
         sm.add_widget(LoginScreen(name='change_pins'))
+        sm.add_widget(AboutScreen(name='about'))
         # Экран авторизации перед сменой PIN
         sm.add_widget(ChangePinLoginScreen(name='change_pin_auth'))
         # Непосредственный экран «Смена PIN»
@@ -173,7 +172,7 @@ class BankingApp(App):
         sm.add_widget(ChangePhoneScreen(name ='phone_creen_sms'))
         sm.add_widget(PhoneLogin(name='connect_sms'))
 
-        sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))
+        # sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))
         sm.add_widget(BankDashboard(name='bank_dashboard'))
         sm.add_widget(DefaultUserTable(name='defaultuser_table'))
         sm.add_widget(RoleTable(name='role_table'))
@@ -185,6 +184,7 @@ class BankingApp(App):
         sm.add_widget(BankWorkerTable(name='bankworker_table'))
         sm.add_widget(WalletTable(name='wallet_table'))
         sm.add_widget(AtmManagementScreen(name='atm_table'))
+        sm.add_widget(TopUpChoiceScreen(name='pay_phone'))
 
         return sm
 

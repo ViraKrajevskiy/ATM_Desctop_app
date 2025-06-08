@@ -66,25 +66,33 @@ class AtmManagementScreen(Screen):
 
     def show_atm_popup(self, atm_instance=None):
         is_edit = atm_instance is not None
+
+    # Check if wallets exist
+        wallets = list(Wallet.select())
+        if not wallets:
+            self.show_error_popup("Нет доступных кошельков. Сначала создайте кошелёк.")
+            return
+
         layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
+    # Location input
         inp_location = TextInput(
             hint_text='Локация банкомата',
-            text=atm_instance.location if is_edit else '')
+            text=atm_instance.location if is_edit else '',
+            multiline=False)
         layout.add_widget(Label(text='Локация банкомата:'))
         layout.add_widget(inp_location)
 
-        wallets = list(Wallet.select())
-        wallet_choices = [f"{w.id} -" for w in wallets]
+    # Wallet selection
+        wallet_choices = [f"{w.id} - {w.id}" for w in wallets]
         spinner_wallet = Spinner(
             text='Выбери кошелёк',
-            values=wallet_choices
-        )
+            values=wallet_choices)
 
         if is_edit and atm_instance.wallet:
             try:
                 selected_text = next(
-                    f"{w.id} - {w.owner_name}" for w in wallets if w.id == atm_instance.wallet.id)
+                    f"{w.id} - {w.id}" for w in wallets if w.id == atm_instance.wallet.id)
                 spinner_wallet.text = selected_text
             except StopIteration:
                 pass
@@ -106,6 +114,9 @@ class AtmManagementScreen(Screen):
             if not location:
                 self.show_error_popup("Локация не может быть пустой")
                 return
+            if len(location) > 100:
+                self.show_error_popup("Локация слишком длинная (макс. 100 символов)")
+                return
 
             if spinner_wallet.text == 'Выбери кошелёк':
                 self.show_error_popup("Пожалуйста, выбери кошелёк")
@@ -126,7 +137,7 @@ class AtmManagementScreen(Screen):
                 popup.dismiss()
                 self.build_screen()
             except Exception as e:
-                self.show_error_popup(f"Ошибка при сохранении: {e}")
+                self.show_error_popup(f"Ошибка при сохранении: {str(e)}")
 
         btn_save.bind(on_press=save)
 

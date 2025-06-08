@@ -433,54 +433,43 @@ class WalletTable(Screen):
         self.build_table()
 
     def build_table(self):
-    # Очищаем старые виджеты
         self.clear_widgets()
-
-    # --- DEBUG: дамп записей Wallet ---
-        print("=== DEBUG: Wallet.select() dump ===")
-        for w in Wallet.select():
-            print(f"Wallet id={w.id}, card_number={w.card.card_number}, money_nominal={w.money.money_nominal}")
-        print("===================================")
-
-    # Основной контейнер
         main = BoxLayout(orientation='vertical', padding=10)
         self.add_widget(main)
 
-    # Верхняя панель с кнопками
+        # Верхняя панель
         header = BoxLayout(size_hint_y=None, height=40, spacing=5)
         header.add_widget(Button(text='Назад',
-                             on_press=lambda *_: setattr(self.manager, 'current', 'bank_dashboard')))
+                                 on_press=lambda *_: setattr(self.manager, 'current', 'bank_dashboard')))
         header.add_widget(Button(text='Добавить',
-                             on_press=lambda *_: self.show_popup()))
+                                 on_press=lambda *_: self.show_popup()))
         main.add_widget(header)
 
-    # Скролл и сетка таблицы
+        # Таблица
         scroll = ScrollView()
         grid = GridLayout(cols=5, size_hint_y=None, spacing=5, padding=5)
         grid.bind(minimum_height=grid.setter('height'))
 
-    # Заголовки столбцов
+        # Заголовки
         for title in ['ID', 'Карта', 'Номинал', 'Редакт.', 'Удалить']:
-            grid.add_widget(Label(text=f'[b]{title}[/b]', markup=True, size_hint_y=None, height=30))
+            grid.add_widget(Label(text=f'[b]{title}[/b]', markup=True,
+                                  size_hint_y=None, height=30))
 
-    # Строки таблицы
+        # Строки таблицы
         for w in Wallet.select():
-        # --- DEBUG: что рисуем для каждой строки
-            print(f"Adding row: id={w.id}, card={w.card.card_number}, nominal={w.money.money_nominal}")
-
             grid.add_widget(Label(text=str(w.id), size_hint_y=None, height=30))
             grid.add_widget(Label(text=str(w.card.card_number), size_hint_y=None, height=30))
             grid.add_widget(Label(text=str(w.money.money_nominal), size_hint_y=None, height=30))
 
+            # Кнопка редактирования
             grid.add_widget(Button(text='✏️', size_hint_y=None, height=30,
-                               on_press=partial(self.show_popup, w.id)))
+                                   on_press=partial(self.show_popup, w.id)))
+            # Кнопка удаления
             grid.add_widget(Button(text='🗑️', size_hint_y=None, height=30,
-                                   on_press=partial(self.delete_wallet, int(w.id))))
+                                   on_press=partial(self.delete_wallet, w.id)))
 
-    # Собираем всё вместе
         scroll.add_widget(grid)
         main.add_widget(scroll)
-
 
     def show_popup(self, wallet_id=None, *_):
         """Показать окно создания/редактирования записи Wallet."""
