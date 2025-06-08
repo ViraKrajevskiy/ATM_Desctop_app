@@ -1,8 +1,6 @@
 from peewee import *
 from Backend.data_base import BaseModel
 
-
-
 class TranzactionMoney(BaseModel):
     from Backend.ClassesNew.ATM.atm import Atm
     from Backend.ClassesNew.ROLE.user import User

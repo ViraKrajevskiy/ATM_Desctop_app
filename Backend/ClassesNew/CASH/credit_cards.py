@@ -10,7 +10,7 @@ class PhoneNumber(BaseModel):
     phone_number = CharField(max_length=12)
 
 class CreditCards(BaseModel):
-    id = AutoField()
+    card_id = AutoField()
 
     card_number = IntegerField()
     balance = IntegerField()

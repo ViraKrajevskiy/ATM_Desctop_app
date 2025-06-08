@@ -2,11 +2,12 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager
 
+from Backend.functions.Bank_worker_dashboard.admin_panel_atm_crud import AtmManagementScreen
 from Backend.functions.Bank_worker_dashboard.admin_panel_roles_crud import DefaultUserTable, RoleTable, BankWorkerTable, \
     IncasatorTable, UserTable
 from Backend.functions.login_logout.login_admin import LoginScreen
 from Backend.functions.Bank_worker_dashboard.admin_panel_cash_crud import *
-
+from Backend.functions.Bank_worker_dashboard.admin_panel_cash_crud import WalletTable
 
 class BankDashboard(Screen):
     def __init__(self, **kwargs):
@@ -41,6 +42,14 @@ class BankDashboard(Screen):
         btn_logout = Button(text='Выйти', size_hint_y=None, height=50)
         btn_logout.bind(on_press=lambda x: setattr(self.manager, 'current', 'language'))
 
+        btn_wallet = Button(text='Кошельки (Wallet)', size_hint_y=None, height=50)
+        btn_wallet.bind(on_press=lambda x: setattr(self.manager, 'current', 'wallet_table'))
+
+        btn_atm = Button(text='Банкоматы (ATM)', size_hint_y=None, height=50)
+        btn_atm.bind(on_press=lambda x: setattr(self.manager, 'current', 'atm_table'))
+
+        layout.add_widget(btn_atm)
+        layout.add_widget(btn_wallet)
         layout.add_widget(btn_defaultuser)
         layout.add_widget(btn_role)
         layout.add_widget(btn_bankworker)
@@ -58,6 +67,7 @@ class BankDashboard(Screen):
 class MyApp(App):
     def build(self):
         self.sm = ScreenManager()
+        self.sm.add_widget(WalletTable(name='wallet_table'))
         self.sm.add_widget(LoginScreen(name="login"))
         self.sm.add_widget(BankDashboard(name="bank_dashboard"))
         self.sm.add_widget(DefaultUserTable(name='defaultuser_table'))
@@ -68,6 +78,8 @@ class MyApp(App):
         self.sm.add_widget(PhoneNumberTable(name='phones_table'))
         self.sm.add_widget(CreditCardTable(name='credit_cards_table'))
         self.sm.add_widget(MoneyManagementScreen(name='money_rate' ))
+        self.sm.add_widget(AtmManagementScreen(name='atm_table'))
+
 
         Window.bind(on_key_down=self.on_key_down)
         return self.sm

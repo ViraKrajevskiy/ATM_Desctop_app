@@ -1,221 +1,181 @@
-from kivy.uix.screenmanager import Screen
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
-# Импорт модели кредитной карты
 from Backend.ClassesNew.CASH.credit_cards import CreditCards
-from Backend.functions.translate.TranslateMenu import *
-# Предполагается, что translations уже загружены в этом модуле:
-# with open('translation.json', "r", encoding="utf-8") as f:
-#     translations = json.load(f)
+from Backend.functions.translate.TranslateMenu import translations
+from kivy.uix.screenmanager import Screen
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 
+
+from kivy.graphics import Color, RoundedRectangle
+from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout
+
+class RoundedButton(Button):
+    def __init__(self, bg_color=(0.2, 0.5, 0.7, 1), **kwargs):
+        super().__init__(**kwargs)
+        self.background_normal = ''
+        self.background_down = ''
+        self.background_color = (0, 0, 0, 0)
+        self.bg_color = bg_color
+        with self.canvas.before:
+            Color(*self.bg_color)
+            self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[15])
+        self.bind(pos=self.update_rect, size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+
+class ThemedBoxLayout(BoxLayout):
+    def __init__(self, bg_color=(0.6078, 0.7882, 0.8117, 1), **kwargs):
+        super().__init__(**kwargs)
+        self.bg_color = bg_color
+        with self.canvas.before:
+            Color(*self.bg_color)
+            self.rect = RoundedRectangle(pos=self.pos, size=self.size, radius=[20])
+        self.bind(pos=self.update_rect, size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.pos = self.pos
+        self.rect.size = self.size
+
+
+
+# Экран авторизации по PIN перед сменой
 class ChangePinLoginScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
+        self.layout = ThemedBoxLayout(orientation='vertical', spacing=10, padding=20)
+
+        self.label = Label(text="Введите текущий PIN", font_size=20, size_hint_y=None, height=40)
+        self.pin_input = TextInput(password=True, multiline=False, size_hint_y=None, height=40)
+        self.button = RoundedButton(text="Продолжить", size_hint_y=None, height=50)
+        self.button.bind(on_press=self.check_pin)
+
+        self.layout.add_widget(self.label)
+        self.layout.add_widget(self.pin_input)
+        self.layout.add_widget(self.button)
         self.add_widget(self.layout)
 
+    def check_pin(self, *args):
+        pin = self.pin_input.text
+        if pin == '1234':
+            self.manager.current = 'change_pin'
+        else:
+            self.label.text = "Неверный PIN. Повторите."
+
     def on_pre_enter(self):
-        # Перестраиваем интерфейс при каждом входе (чтобы подтянулись переводы)
-        self.build_ui()
-
-    def build_ui(self):
         self.layout.clear_widgets()
-        lang = self.manager.language
-        texts = translations[lang]
+        texts = translations[self.manager.language]
 
-        # Заголовок
-        lbl_title = Label(
-            text=texts.get("EnterCardNum", "Enter your card number:"),
-            font_size=24,
-            size_hint_y=None,
-            height=40
-        )
-        self.layout.add_widget(lbl_title)
-
-        # Поле для номера карты
-        self.card_input = TextInput(
-            hint_text=texts.get("EnterCardNum", "Enter your card number:"),
-            input_filter='int',
-            multiline=False,
-            size_hint_y=None,
-            height=40
-        )
+        self.layout.add_widget(Label(text=texts["EnterCardNum"], font_size=24, size_hint_y=None, height=40))
+        self.card_input = TextInput(hint_text=texts["EnterCardNum"], input_filter='int', multiline=False, size_hint_y=None, height=40)
         self.layout.add_widget(self.card_input)
 
-        # Поле для старого PIN
-        self.pin_input = TextInput(
-            hint_text=texts.get("EnterPIN", "Enter your PIN code:"),
-            password=True,
-            input_filter='int',
-            multiline=False,
-            size_hint_y=None,
-            height=40
-        )
+        self.pin_input  = TextInput(hint_text=texts["EnterPIN"], password=True, input_filter='int', multiline=False, size_hint_y=None, height=40)
         self.layout.add_widget(self.pin_input)
 
-        # Кнопка «Далее»
-        btn_next = Button(
-            text=texts.get("ChangePin", "Enter your new PIN code."),
-            size_hint_y=None,
-            height=50
-        )
+        btn_next = RoundedButton(text=texts["ChangePin"], size_hint_y=None, height=50)
         btn_next.bind(on_press=self.on_authenticate)
         self.layout.add_widget(btn_next)
 
-        # Кнопка «Назад»
-        btn_back = Button(
-            text=texts.get("back_button", "Back"),
-            size_hint_y=None,
-            height=50
-        )
-        btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'menu'))
+        btn_back = RoundedButton(text=texts.get("back_button", "Назад/Back/Ortga"), size_hint_y=None, height=50)
+        btn_back.bind(on_press=lambda _: setattr(self.manager, 'current', 'menu'))
         self.layout.add_widget(btn_back)
 
-    def on_authenticate(self, instance):
-        lang = self.manager.language
-        texts = translations[lang]
-
-        card_num = self.card_input.text.strip()
-        pin_code = self.pin_input.text.strip()
-
-        if not card_num or not pin_code:
-            self.show_popup(texts.get("InvalidOption", "Please enter a valid number."))
-            return
-
-        # Ищем карту
+    def on_authenticate(self, _):
+        texts = translations[self.manager.language]
+        num, pin = self.card_input.text.strip(), self.pin_input.text.strip()
+        if not num or not pin:
+            return self._popup(texts["InvalidOption"])
         try:
-            card = CreditCards.get(CreditCards.card_number == int(card_num))
-        except (CreditCards.DoesNotExist, ValueError):
-            self.show_popup(texts.get("KardNotCorrect", "Incorrect card number or PIN code."))
-            return
-
-        # Проверяем PIN
-        if str(card.security_code) != pin_code:
-            self.show_popup(texts.get("KardNotCorrect", "Incorrect card number or PIN code."))
-            return
-
-        # Авторизация успешна — сохраняем найденную карту в manager и переходим к смене PIN
+            card = CreditCards.get(CreditCards.card_number == int(num))
+        except Exception:
+            return self._popup(texts["KardNotCorrect"])
+        if str(card.security_code) != pin:
+            return self._popup(texts["KardNotCorrect"])
         self.manager.selected_card = card
         self.manager.current = 'change_pin'
 
-    def show_popup(self, message, title=None):
-        lang = self.manager.language
-        texts = translations[lang]
-        popup_title = title or texts.get("KardNotCorrect", "Error")
-        popup = Popup(
-            title=popup_title,
-            content=Label(text=message),
-            size_hint=(0.6, 0.4)
-        )
-        popup.open()
+    def _popup(self, msg):
+        texts = translations[self.manager.language]
+        Popup(title=texts["KardNotCorrect"], content=Label(text=msg), size_hint=(0.6,0.4)).open()
 
 
 
+
+# Экран смены PIN
 class ChangePinScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=20)
+        from Backend.functions.main_menu.front_main_menu import ThemedBoxLayout
+
+        self.layout = ThemedBoxLayout(orientation='vertical', spacing=10, padding=20)
         self.add_widget(self.layout)
 
     def on_pre_enter(self):
-        # Если карточка не передана — возвращаем на экран авторизации
         if not hasattr(self.manager, 'selected_card'):
             self.manager.current = 'change_pin_auth'
             return
         self.build_ui()
 
+
+
     def build_ui(self):
         self.layout.clear_widgets()
-        lang = self.manager.language
-        texts = translations[lang]
 
-        # Заголовок
-        lbl_title = Label(
-            text=texts.get("ExchangeTitle", "Change PIN"),
-            font_size=24,
-            size_hint_y=None,
-            height=40
-        )
-        self.layout.add_widget(lbl_title)
-
-        # Отобразим номер карты, чтобы пользователь видел, для какой карты меняем PIN
+        texts = translations[self.manager.language]
         card = self.manager.selected_card
-        lbl_cardnum = Label(
-            text=f"{texts.get('EnterCardNum', 'Card Number:')} {card.card_number}",
-            size_hint_y=None,
-            height=30
-        )
-        self.layout.add_widget(lbl_cardnum)
 
-        # Поле для нового PIN
-        self.new_pin_input = TextInput(
-            hint_text=texts.get("ChangePin", "Enter your new PIN code."),
-            password=True,
-            input_filter='int',
-            multiline=False,
-            size_hint_y=None,
-            height=40
-        )
-        self.layout.add_widget(self.new_pin_input)
+        self.layout.add_widget(Label(text=texts["ChangePin"], font_size=24, size_hint_y=None, height=40))
+        self.layout.add_widget(Label(text=f"{texts['EnterCardNum']} {card.card_number}", size_hint_y=None, height=30))
 
-        # Кнопка «Сохранить»
-        btn_save = Button(
-            text=texts.get("ExchangeMethod", "Save"),  # если нужен особый перевод, можно вынести отдельным ключом
-            size_hint_y=None,
-            height=50
-        )
-        btn_save.bind(on_press=self.on_save_pin)
+        self.new_pin = TextInput(hint_text=texts["ChangePin"], password=True, input_filter='int',
+                             multiline=False, size_hint_y=None, height=40)
+        self.layout.add_widget(self.new_pin)
+
+        self.confirm_pin = TextInput(hint_text=texts["InvalidOptionRange"], password=True,
+                                 input_filter='int', multiline=False, size_hint_y=None, height=40)
+        self.layout.add_widget(self.confirm_pin)
+
+        btn_save = RoundedButton(text=texts["ChangePin"], size_hint_y=None, height=50)
+        btn_save.bind(on_press=self.on_save)
         self.layout.add_widget(btn_save)
 
-        # Кнопка «Назад» — вернуться в авторизацию смены PIN
-        btn_back = Button(
-            text=texts.get("back_button", "Back"),
-            size_hint_y=None,
-            height=50
-        )
-        btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'change_pin_auth'))
+        btn_back = RoundedButton(text=texts.get("back_button", "Назад/Back/Ortga"), size_hint_y=None, height=50)
+        btn_back.bind(on_press=lambda _: setattr(self.manager, 'current', 'change_pin_auth'))
         self.layout.add_widget(btn_back)
 
-    def on_save_pin(self, instance):
-        lang = self.manager.language
-        texts = translations[lang]
 
-        new_pin = self.new_pin_input.text.strip()
-        if not new_pin:
-            self.show_popup(texts.get("InvalidOption", "Please enter a valid number."))
-            return
+    def _popup(self, msg):
+        texts = translations[self.manager.language]
+        Popup(title=texts["Error"], content=Label(text=msg), size_hint=(0.6, 0.4)).open()
 
-        # Обновляем PIN в объекте карточки
+    def on_save(self, _):
+        texts = translations[self.manager.language]
+        n, c = self.new_pin.text.strip(), self.confirm_pin.text.strip()
+        if not n or not c:
+            return self._popup(texts["InvalidOption"])
+        if n != c:
+            return self._popup(texts["PINMismatch"])
         card = self.manager.selected_card
         try:
-            card.security_code = int(new_pin)
+            card.security_code = int(n)
             card.save()
-        except ValueError:
-            self.show_popup(texts.get("InvalidOption", "Please enter a valid number."))
-            return
+        except Exception as e:
+            return self._popup(f"{texts['InvalidOption']}\n{str(e)}")
 
-        # Успешно изменили PIN — покажем сообщение и вернёмся в главное меню
-        self.show_popup(
-            texts.get("BackToMenu", "Press Enter to return to menu."),
-            title=texts.get("ExchangeTitle", "Success")
-        )
-        # Стираем номер из memory, чтобы при повторном заходе приходил заново
-        delattr(self.manager, 'selected_card')
-        # После закрытия попапа вернём в меню
-        self.manager.current = 'menu'
-
-    def show_popup(self, message, title=None):
-        lang = self.manager.language
-        texts = translations[lang]
-        popup_title = title or texts.get("ExchangeTitle", "Info")
         popup = Popup(
-            title=popup_title,
-            content=Label(text=message),
-            size_hint=(0.6, 0.4)
-        )
+            title=texts["ExchangeTitle"],
+            content=Label(text=texts["BackToMenu"]),
+            size_hint=(0.6, 0.4))
+
+        def on_popup_dismiss(*args):
+            if hasattr(self.manager, 'selected_card'):
+                delattr(self.manager, 'selected_card')
+            self.manager.current = 'language'
+
+        popup.bind(on_dismiss=on_popup_dismiss)
         popup.open()
         

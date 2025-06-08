@@ -10,9 +10,8 @@ class Wallet(BaseModel):
     money = ForeignKeyField(Money, backref='wallets')
     card = ForeignKeyField(CreditCards, backref='wallets')
 
-    def get_wallet_balance(wallet_id: int):
-        wallet = Wallet.get_by_id(wallet_id)
-        total = 0
-        for money in wallet.money:  # .money — через backref
-            total += money.nominal.value * money.count
+    @staticmethod
+    def get_card_balance(card_id: int):
+        query = Wallet.select().where(Wallet.card_id == card_id)
+        total = sum(w.money.money_nominal for w in query)
         return total

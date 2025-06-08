@@ -1,5 +1,7 @@
 import os
 from kivy.graphics import Color, RoundedRectangle
+
+from Backend.functions.changes_phone_pin.change_phone import PhoneLogin, ChangePhoneScreen
 from Backend.functions.changes_phone_pin.change_pin import ChangePinLoginScreen, ChangePinScreen
 from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
 from Backend.functions.translate.TranslateMenu import translations
@@ -107,7 +109,7 @@ class MainMenuScreen(Screen):
         screen_map = {
             0: 'about',
             1: 'currency',
-            2: 'change_pin',
+            2: 'change_pin_auth',
             3: 'transactions',
             4: 'connect_sms',
             5: 'pay_phone',
@@ -161,15 +163,16 @@ class BankingApp(App):
         sm.add_widget(MainMenuScreen(name='menu'))
         sm.add_widget(InfoScreen(name='about', text_key='AboutUs'))
         sm.add_widget(CurrencyScreen(name='currency'))
-        sm.add_widget(LoginScreen(name='change_pins', text_key='ChangePin'))
-
+        sm.add_widget(LoginScreen(name='change_pins'))
         # Экран авторизации перед сменой PIN
-        sm.add_widget(ChangePinLoginScreen(name='change_pin'))
+        sm.add_widget(ChangePinLoginScreen(name='change_pin_auth'))
         # Непосредственный экран «Смена PIN»
-        sm.add_widget(ChangePinScreen(name='changes_pin'))
+        sm.add_widget(ChangePinScreen(name='change_pin'))
 
         sm.add_widget(InfoScreen(name='transactions', text_key='Transactions'))
-        sm.add_widget(InfoScreen(name='connect_sms', text_key='ConnectSMS'))
+        sm.add_widget(ChangePhoneScreen(name ='phone_creen_sms'))
+        sm.add_widget(PhoneLogin(name='connect_sms'))
+
         sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))
         sm.add_widget(BankDashboard(name='bank_dashboard'))
         sm.add_widget(DefaultUserTable(name='defaultuser_table'))
@@ -178,9 +181,13 @@ class BankingApp(App):
         sm.add_widget(UserTable(name='user_table'))
         sm.add_widget(PhoneNumberTable(name='phones_table'))
         sm.add_widget(CreditCardTable(name='credit_cards_table'))
-        sm.add_widget(MoneyManagementScreen(name='money_rate' ))
+        sm.add_widget(MoneyManagementScreen(name='money_rate'))
         sm.add_widget(BankWorkerTable(name='bankworker_table'))
+        sm.add_widget(WalletTable(name='wallet_table'))
+        sm.add_widget(AtmManagementScreen(name='atm_table'))
+
         return sm
+
 
 if __name__ == '__main__':
     BankingApp().run()
