@@ -1,5 +1,9 @@
 {
   "en": {
+      "CurrentPhone": "Connected phone number",
+      "NoPhoneConnected": "No phone number connected",
+      "NotEnoughPhoneBalance": "Not enough funds on the phone",
+    "ExchangeTitle":"End",
     "EnterCardNum":    "Enter your card number:",
     "EnterPIN":        "Enter your PIN code:",
     "KardNotCorrect":  "Incorrect card number or PIN code.",
@@ -18,7 +22,6 @@
     "selectlanguage":  "Ru",
     "Error":           "Error not worked.",
     "PhoneStatus":     "Phone Status",
-    "NoPhoneConnected":"No phone connected",
     "AddPhone":        "Add phone",
     "PhoneConnected":  "Phone connected",
     "PhoneSaved":      "Phone saved successfully",
@@ -58,6 +61,7 @@
     "MoneyRater":          "Enter your phone number or last 4 digits of your card."
   },
   "ru": {
+      "ExchangeTitle":"Конец",
       "EnterCardNum":    "Введите номер карты:",
       "EnterPIN":        "Введите PIN-код:",
       "KardNotCorrect":  "Неверный номер карты или PIN-код.",
@@ -75,7 +79,6 @@
       "ChooseLanguage":  "Главное меню:",
       "Error":           "Ошибка не работает.",
       "PhoneStatus":     "Статус телефона",
-      "NoPhoneConnected":"Телефон не привязан",
       "AddPhone":        "Привязать телефон",
       "PhoneConnected":  "Привязан номер",
       "PhoneSaved":      "Телефон успешно сохранён",
@@ -112,9 +115,16 @@
       "LoginCardMOney":      "Наличными или картой?",
       "Money":               "Наличными",
       "Card":                "Картой",
-      "MoneyRater":          "Введите ваш номер телефона или последние 4 цифры карты."
+      "MoneyRater":          "Введите ваш номер телефона или последние 4 цифры карты.",
+      "CurrentPhone": "Подключённый номер",
+      "NoPhoneConnected": "Номер телефона не подключён",
+      "NotEnoughPhoneBalance": "Недостаточно средств на телефоне"
   },
   "uz": {
+      "CurrentPhone": "Ulangan telefon raqami",
+      "NoPhoneConnected": "Telefon raqami ulanmagan",
+      "NotEnoughPhoneBalance": "Telefon balansida mablag' yetarli emas",
+      "ExchangeTitle":"Tugadi",
       "EnterCardNum":    "Karta raqamingizni kiriting:",
       "EnterPIN":        "PIN kodni kiriting:",
       "KardNotCorrect":  "Karta raqami yoki PIN noto‘g‘ri.",
@@ -132,7 +142,6 @@
       "ChooseLanguage":  "Asosiy menyu:",
       "Error":           "Nosozlik",
       "PhoneStatus":     "Telefon holati",
-      "NoPhoneConnected":"Telefon ulanmagan",
       "AddPhone":        "Telefonni ulash",
       "PhoneConnected":  "Ulangan raqam",
       "PhoneSaved":      "Telefon muvaffaqiyatli saqlandi",

@@ -16,7 +16,7 @@ from Backend.ClassesNew.ROLE.base_user_m import DefaultUser, Role
 from Backend.ClassesNew.ROLE.bank_worker import BankWorker
 from Backend.ClassesNew.ROLE.incasator import Incasator
 from Backend.ClassesNew.ROLE.user import User
-from Backend.ClassesNew.CASH.wallet import Wallet
+from Backend.ClassesNew.CASH.wallet import Wallet, WalletMoney
 
 from Backend.data_base.core import db
 
@@ -608,148 +608,150 @@ class IncasatorTable(Screen):
 class UserTable(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Храним текст фильтра между перестройками таблицы
         self.filter_text = ''
 
     def on_pre_enter(self):
-        # При входе на экран строим таблицу
         self.build_table()
 
     def build_table(self):
         self.clear_widgets()
-        root_layout = BoxLayout(orientation='vertical', padding=10)
+        layout = BoxLayout(orientation='vertical', padding=10)
 
-        # ─── Секция «Фильтр» ───────────────────────────────────────────────────────
+        # Фильтр
         filter_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
-
-        # Каждый раз создаём новый TextInput, сразу подставляя в него прошлый текст фильтра
-        filter_input = TextInput(
-            text=self.filter_text,
-            hint_text="Фильтр по Connect DefaultUser ID",
-            multiline=False
-        )
-
+        filter_input = TextInput(text=self.filter_text,
+                                 hint_text="Фильтр по Connect DefaultUser ID",
+                                 multiline=False)
         btn_apply = Button(text="Применить", size_hint_x=None, width=100)
         btn_apply.bind(on_press=lambda inst: self.on_apply_filter(filter_input.text))
-
         filter_box.add_widget(filter_input)
         filter_box.add_widget(btn_apply)
-        root_layout.add_widget(filter_box)
-        # ──────────────────────────────────────────────────────────────────────────
+        layout.add_widget(filter_box)
 
-        # ─── Кнопки навигации («Назад» и «Добавить») ──────────────────────────────
-        btn_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
+        # Навигация
+        nav_box = BoxLayout(size_hint_y=None, height=40, spacing=10)
         btn_back = Button(text='Назад')
-        btn_back.bind(on_press=lambda x: setattr(self.manager, 'current', 'bank_dashboard'))
-
+        btn_back.bind(on_press=lambda _: setattr(self.manager, 'current', 'bank_dashboard'))
         btn_add = Button(text='Добавить')
         btn_add.bind(on_press=self.open_add_popup)
+        nav_box.add_widget(btn_back)
+        nav_box.add_widget(btn_add)
+        layout.add_widget(nav_box)
 
-        btn_box.add_widget(btn_back)
-        btn_box.add_widget(btn_add)
-        root_layout.add_widget(btn_box)
-        # ──────────────────────────────────────────────────────────────────────────
-
-        # ─── Основная таблица ───────────────────────────────────────────────────────
+        # Таблица
         scroll = ScrollView()
         grid = GridLayout(cols=5, size_hint_y=None, spacing=5, padding=5)
         grid.bind(minimum_height=grid.setter('height'))
 
-        # Заголовки столбцов
-        headers = ['ID', 'Connect DefaultUser ID', 'Wallet Count', 'Редакт.', 'Удалить']
+        headers = ['ID', 'Connect DefaultUser ID', 'WalletMoney ID', 'Редакт.', 'Удалить']
         for h in headers:
-            lbl = Label(text=f'[b]{h}[/b]', markup=True, size_hint_y=None, height=30)
-            grid.add_widget(lbl)
+            grid.add_widget(Label(text=f'[b]{h}[/b]', markup=True,
+                                  size_hint_y=None, height=30))
 
-        # Подготавливаем выборку с учётом фильтра
         query = User.select()
         if self.filter_text.strip():
             try:
                 fid = int(self.filter_text.strip())
-                query = query.where(User.connect == fid)
+                query = query.where(User.connect_id == fid)
             except ValueError:
-                # Если ввели не число, оставляем без фильтрации
                 pass
 
-        # Заполняем таблицу записями
-        for user in query:
-            grid.add_widget(Label(text=str(user.id), size_hint_y=None, height=30))
-            grid.add_widget(Label(
-                                text=str(user.connect.id) if user.connect else "None",
-                                size_hint_y=None, height=30
-                            ))
-
-            # Подсчёт кошельков пользователя
-            try:
-                wallets_count = Wallet.select().where(Wallet.user == user).count()
-            except Exception:
-                wallets_count = 0
-            grid.add_widget(Label(text=str(wallets_count), size_hint_y=None, height=30))
+        for usr in query:
+            grid.add_widget(Label(text=str(usr.id), size_hint_y=None, height=30))
+            grid.add_widget(Label(text=str(usr.connect.id) if usr.connect else "None",
+                                  size_hint_y=None, height=30))
+            wm_ids = [str(wm.id) for wm in usr.wallet]  # ManyToMany
+            grid.add_widget(Label(text=",".join(wm_ids) if wm_ids else "None",
+                                  size_hint_y=None, height=30))
 
             btn_edit = Button(text='✏️', size_hint_y=None, height=30)
-            btn_edit.bind(on_press=lambda x, u=user: self.open_edit_popup(u))
+            btn_edit.bind(on_press=lambda inst, u=usr: self.open_edit_popup(u))
             grid.add_widget(btn_edit)
 
             btn_del = Button(text='🗑️', size_hint_y=None, height=30)
-            btn_del.bind(on_press=lambda x, u=user: self.delete_user(u))
+            btn_del.bind(on_press=lambda inst, u=usr: self.delete_user(u))
             grid.add_widget(btn_del)
 
         scroll.add_widget(grid)
-        root_layout.add_widget(scroll)
-        # ──────────────────────────────────────────────────────────────────────────
+        layout.add_widget(scroll)
+        self.add_widget(layout)
 
-        self.add_widget(root_layout)
-
-    def on_apply_filter(self, new_text):
-        # Сохраняем введённое значение фильтра и перестраиваем таблицу
-        self.filter_text = new_text
+    def on_apply_filter(self, text):
+        self.filter_text = text
         self.build_table()
 
     def open_add_popup(self, instance=None):
         self.show_user_popup()
 
-    def open_edit_popup(self, user):
-        self.show_user_popup(user)
+    def open_edit_popup(self, user_obj):
+        self.show_user_popup(user_obj)
 
-    def show_user_popup(self, user=None):
-        is_edit = user is not None
+    def show_user_popup(self, user_obj=None):
+        is_edit = user_obj is not None
         popup_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
 
-        inp_connect_id = TextInput(
-            text=str(user.connect.id) if is_edit and user.connect else '',
-            hint_text="Connect DefaultUser ID",
-            input_filter='int'
-        )
-        popup_layout.add_widget(inp_connect_id)
+        inp_connect = TextInput(text=str(user_obj.connect.id) if is_edit and user_obj.connect else '',
+                                hint_text="Connect DefaultUser ID",
+                                input_filter='int', multiline=False)
+        popup_layout.add_widget(inp_connect)
 
-        btn_save = Button(text='Сохранить')
+        # Spinner WalletMoney
+        wm_list = list(WalletMoney.select())
+        wm_vals = [f"{wm.id}: W{wm.wallet.id} ({wm.money.money_nominal}×{wm.quantity})" for wm in wm_list]
+        spinner_wm = Spinner(
+            text=wm_vals[0] if is_edit and user_obj.wallet else 'Выберите WalletMoney',
+            values=wm_vals,
+            size_hint_y=None, height=40
+        )
+        popup_layout.add_widget(Label(text='Привязать к WalletMoney:'))
+        popup_layout.add_widget(spinner_wm)
+
+        btn_save = Button(text='Сохранить', size_hint_y=None, height=40)
         popup_layout.add_widget(btn_save)
 
-        popup = Popup(
-            title='Редактирование' if is_edit else 'Добавление',
-            content=popup_layout,
-            size_hint=(0.6, 0.4)
-        )
-        btn_save.bind(on_press=lambda x: self.save_user(user, inp_connect_id.text, popup))
+        popup = Popup(title='Редактирование' if is_edit else 'Добавление',
+                      content=popup_layout,
+                      size_hint=(0.7, 0.6))
         popup.open()
 
-    def save_user(self, user, connect_id_text, popup):
-        try:
-            connect_id = int(connect_id_text)
-            connect_obj = DefaultUser.get_by_id(connect_id)
-        except Exception:
-            print(f"[!] Ошибка: некорректный connect_id: {connect_id_text}")
-            return
+        def do_save(inst):
+            # Работаем с переменной user
+            if is_edit:
+                usr = user_obj
+            else:
+                # создаём нового
+                try:
+                    cid = int(inp_connect.text)
+                    connect_obj = DefaultUser.get_by_id(cid)
+                except Exception:
+                    print(f"Ошибка connect_id: {inp_connect.text}")
+                    return
+                usr = User.create(connect=connect_obj)
 
-        if user:
-            user.connect = connect_obj
-            user.save()
-        else:
-            User.create(connect=connect_obj)
+            # Если редактирование, обновляем connect
+            if is_edit:
+                try:
+                    cid = int(inp_connect.text)
+                    connect_obj = DefaultUser.get_by_id(cid)
+                    usr.connect = connect_obj
+                    usr.save()
+                except Exception:
+                    print(f"Ошибка connect_id: {inp_connect.text}")
 
-        popup.dismiss()
-        self.build_table()
+            # Привязка WalletMoney
+            try:
+                wm_id = int(spinner_wm.text.split(':', 1)[0])
+                wm_obj = WalletMoney.get_by_id(wm_id)
+                usr.wallet.clear()
+                usr.wallet.add(wm_obj)
+            except Exception:
+                print(f"Ошибка WalletMoney: {spinner_wm.text}")
 
-    def delete_user(self, user):
-        user.delete_instance()
+            popup.dismiss()
+            self.build_table()
+
+        btn_save.bind(on_press=do_save)
+
+    def delete_user(self, user_obj):
+        user_obj.delete_instance(recursive=True)
         self.build_table()

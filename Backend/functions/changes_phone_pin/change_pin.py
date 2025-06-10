@@ -144,7 +144,7 @@ class ChangePinScreen(Screen):
         self.layout.add_widget(btn_save)
 
         btn_back = RoundedButton(text=texts.get("back_button", "Назад/Back/Ortga"), size_hint_y=None, height=50)
-        btn_back.bind(on_press=lambda _: setattr(self.manager, 'current', 'change_pin_auth'))
+        btn_back.bind(on_press=lambda _: setattr(self.manager, 'current', 'menu'))
         self.layout.add_widget(btn_back)
 
 
@@ -167,7 +167,7 @@ class ChangePinScreen(Screen):
             return self._popup(f"{texts['InvalidOption']}\n{str(e)}")
 
         popup = Popup(
-            title=texts["ExchangeTitle"],
+                title=texts("ExchangeTitle","back"),
             content=Label(text=texts["BackToMenu"]),
             size_hint=(0.6, 0.4))
 

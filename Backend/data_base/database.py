@@ -1,3 +1,6 @@
+
+
+
 def create_all_tables():
     from Backend.ClassesNew.CASH.credit_cards import CreditCards, PhoneNumber
     from Backend.ClassesNew.CASH.money import Money
@@ -7,7 +10,7 @@ def create_all_tables():
     from Backend.ClassesNew.ROLE.base_user_m import DefaultUser, Role
     from Backend.ClassesNew.ROLE.incasator import Incasator
     from Backend.ClassesNew.ROLE.user import User
-
+    from Backend.ClassesNew.CASH.wallet import WalletMoney
 
     from Backend.data_base.core import db
     from Backend.ClassesNew.ATM.atm import Atm
@@ -23,7 +26,7 @@ def create_all_tables():
         Money, PhoneNumber, CreditCards,
         Wallet, Atm, CurrencyRate, TranzactionMoney,
         creditcard_phone_through,
-        user_wallet_through,  # <-- обязательно добавить эту таблицу
+        user_wallet_through,WalletMoney  # <-- обязательно добавить эту таблицу
     ])
 
 
@@ -35,6 +38,7 @@ def print_all_records(model):
 
 def main():
     create_all_tables()
+    from Backend.ClassesNew.CASH.wallet import WalletMoney
     from Backend.ClassesNew.CASH.credit_cards import CreditCards, PhoneNumber
     from Backend.ClassesNew.CASH.money import Money
     from Backend.ClassesNew.CASH.tranzaction import TranzactionMoney
@@ -51,6 +55,7 @@ def main():
     user_wallet_through = User.wallet.get_through_model()
 
     models = [
+        WalletMoney,
         creditcard_phone_through,
         user_wallet_through,  # <-- добавить
         PhoneNumber,
@@ -71,8 +76,5 @@ def main():
 
     Role.create_default_roles()
     
-
-
-
 if __name__ == "__main__":
     main()

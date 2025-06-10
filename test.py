@@ -110,3 +110,30 @@
 # if __name__ == '__main__':
 #     ChartApp().run()
 #
+
+
+
+
+
+
+def idealnumber(n):
+    # Отриц чиc
+    if n < 0:
+        return False
+
+    num = 0
+    for i in range(1, n):
+        print(num)
+        if n % i == 0:
+            num += i
+
+    return num  == n
+
+user_inp = int(input("Введите число:"))
+
+if idealnumber(user_inp):
+    print(f"{user_inp} - Совершенное число")
+else:
+    print(f"{user_inp} - Это не совершенное число.")
+
+

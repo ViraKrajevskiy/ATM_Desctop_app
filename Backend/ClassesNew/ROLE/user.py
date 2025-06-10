@@ -1,11 +1,12 @@
 from peewee import *
 from Backend.ClassesNew.ROLE.base_user_m import Role, DefaultUser
 from Backend.data_base.core import BaseModel
-from Backend.ClassesNew.CASH.wallet import Wallet
+from Backend.ClassesNew.CASH.wallet import Wallet, WalletMoney
+
 
 class User(BaseModel):
     connect = ForeignKeyField(DefaultUser, backref='user_profile')
-    wallet = ManyToManyField(Wallet, backref='users')
+    wallet = ManyToManyField(WalletMoney, backref='users')
 
     def save(self, *args, **kwargs):
         # Убедимся, что у пользователя есть роль USER

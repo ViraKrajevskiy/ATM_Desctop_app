@@ -7,5 +7,5 @@ class TranzactionMoney(BaseModel):
 
     money = AutoField()
     payment_type = CharField()
-    pay_in = ManyToManyField(Atm, backref='do_these_bacnomat')  # Аналогично стоит проверить этот
-    User = ManyToManyField(User, backref='whopayed')
+    pay_in = ForeignKeyField(Atm, backref='do_these_bacnomat')  # Аналогично стоит проверить этот
+    User = ForeignKeyField(User, backref='whopayed')

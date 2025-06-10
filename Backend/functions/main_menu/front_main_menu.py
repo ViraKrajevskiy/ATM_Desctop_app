@@ -4,11 +4,12 @@ from kivy.graphics import Color, RoundedRectangle
 from Backend.functions.changes_phone_pin.change_phone import PhoneLogin, ChangePhoneScreen
 from Backend.functions.changes_phone_pin.change_pin import ChangePinLoginScreen, ChangePinScreen
 from Backend.functions.main_menu.about_page import AboutScreen
-from Backend.functions.phone.pay_hone_number.pay_phone import TopUpChoiceScreen
+
+# from Backend.functions.phone.pay_hone_number.pay_phone import PaymentMethodScreen
+
 from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
 from Backend.functions.translate.TranslateMenu import translations
 from Backend.functions.Bank_worker_dashboard.main_func import *
-
 
 class RoundedButton(Button):
     def __init__(self, **kwargs):
@@ -126,12 +127,11 @@ class MainMenuScreen(Screen):
                 btn.bind(on_press=lambda inst: App.get_running_app().stop())
             self.layout.add_widget(btn)
 
-
-
 class MyScreenManager(ScreenManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.language = 'en'
+        self.current_user = None
 
     def switch_to_screen(self, screen_name):
         self.current = screen_name
@@ -158,6 +158,7 @@ class InfoScreen(Screen):
 class BankingApp(App):
     def build(self):
         sm = MyScreenManager()
+        # sm.add_widget(CardPaymentScreen(name='cardpayphone0'))
         sm.add_widget(LanguageScreen(name='language'))
         sm.add_widget(MainMenuScreen(name='menu'))
         sm.add_widget(CurrencyScreen(name='currency'))
@@ -172,7 +173,12 @@ class BankingApp(App):
         sm.add_widget(ChangePhoneScreen(name ='phone_creen_sms'))
         sm.add_widget(PhoneLogin(name='connect_sms'))
 
-        # sm.add_widget(InfoScreen(name='pay_phone', text_key='LoginCardMOney'))
+
+        sm.add_widget(WalletCard(name='wal_card'))
+
+
+        # sm.add_widget(PaymentMethodScreen(name ='pay_phone' ))
+
         sm.add_widget(BankDashboard(name='bank_dashboard'))
         sm.add_widget(DefaultUserTable(name='defaultuser_table'))
         sm.add_widget(RoleTable(name='role_table'))
@@ -184,7 +190,6 @@ class BankingApp(App):
         sm.add_widget(BankWorkerTable(name='bankworker_table'))
         sm.add_widget(WalletTable(name='wallet_table'))
         sm.add_widget(AtmManagementScreen(name='atm_table'))
-        sm.add_widget(TopUpChoiceScreen(name='pay_phone'))
 
         return sm
 

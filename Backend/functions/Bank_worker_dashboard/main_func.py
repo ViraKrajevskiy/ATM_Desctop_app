@@ -42,23 +42,29 @@ class BankDashboard(Screen):
         btn_logout = Button(text='Выйти', size_hint_y=None, height=50)
         btn_logout.bind(on_press=lambda x: setattr(self.manager, 'current', 'language'))
 
-        btn_wallet = Button(text='Кошельки (Wallet)', size_hint_y=None, height=50)
+        btn_wallet = Button(text='Подключение карты (WalletCart)', size_hint_y=None, height=50)
         btn_wallet.bind(on_press=lambda x: setattr(self.manager, 'current', 'wallet_table'))
 
         btn_atm = Button(text='Банкоматы (ATM)', size_hint_y=None, height=50)
         btn_atm.bind(on_press=lambda x: setattr(self.manager, 'current', 'atm_table'))
 
+        btn_card_walet = Button(text='Кошелек деньги(CardMoney)', size_hint_y=None, height=50)
+        btn_card_walet.bind(on_press=lambda x: setattr(self.manager, 'current', 'wal_card'))
+
+
         layout.add_widget(btn_atm)
         layout.add_widget(btn_wallet)
+        layout.add_widget(btn_card_walet)
+        layout.add_widget(btn_money)
         layout.add_widget(btn_defaultuser)
-        layout.add_widget(btn_role)
+        layout.add_widget(btn_credit_cards)
         layout.add_widget(btn_bankworker)
         layout.add_widget(btn_incasator)
         layout.add_widget(btn_user)
-        layout.add_widget(btn_credit_cards)  # Исправлено на btn_credit_cards
+        layout.add_widget(btn_role)
         layout.add_widget(btn_phones)
-        layout.add_widget(btn_money)
         layout.add_widget(btn_logout)
+
 
 
         self.add_widget(layout)
@@ -79,7 +85,7 @@ class MyApp(App):
         self.sm.add_widget(CreditCardTable(name='credit_cards_table'))
         self.sm.add_widget(MoneyManagementScreen(name='money_rate' ))
         self.sm.add_widget(AtmManagementScreen(name='atm_table'))
-        
+        self.sm.add_widget(WalletCard(name='wal_card'))
         Window.bind(on_key_down=self.on_key_down)
         return self.sm
 

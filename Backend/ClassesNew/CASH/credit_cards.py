@@ -24,4 +24,6 @@ class CreditCards(BaseModel):
     card_end_date = DateField()
     phone_field = ManyToManyField(PhoneNumber, backref='phones')
 
+
+
 CreditCardsPhoneThrough = CreditCards.phone_field.get_through_model()
