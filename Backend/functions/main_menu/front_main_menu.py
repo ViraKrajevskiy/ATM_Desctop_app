@@ -5,7 +5,8 @@ from Backend.functions.changes_phone_pin.change_phone import PhoneLogin, ChangeP
 from Backend.functions.changes_phone_pin.change_pin import ChangePinLoginScreen, ChangePinScreen
 from Backend.functions.main_menu.about_page import AboutScreen
 
-# from Backend.functions.phone.pay_hone_number.pay_phone import PaymentMethodScreen
+
+
 
 from Backend.functions.see_course_mon.front_end_main import CurrencyScreen
 from Backend.functions.translate.TranslateMenu import translations
@@ -157,6 +158,7 @@ class InfoScreen(Screen):
 
 class BankingApp(App):
     def build(self):
+        from Backend.functions.phone.pay_hone_number.pay_phone import PhoneTopUpStartScreen, PhoneTopUpScreen
         sm = MyScreenManager()
         # sm.add_widget(CardPaymentScreen(name='cardpayphone0'))
         sm.add_widget(LanguageScreen(name='language'))
@@ -190,6 +192,9 @@ class BankingApp(App):
         sm.add_widget(BankWorkerTable(name='bankworker_table'))
         sm.add_widget(WalletTable(name='wallet_table'))
         sm.add_widget(AtmManagementScreen(name='atm_table'))
+
+        sm.add_widget(PhoneTopUpStartScreen(name='pay_phone'))
+        sm.add_widget(PhoneTopUpScreen(name='phone_topup_screen'))
 
         return sm
 

@@ -39,13 +39,13 @@ class LoginScreen(Screen):
 
     def verify_credentials(self, instance):
         self.manager.current = 'bank_dashboard'
-        # login = self.login_input.text.strip()
-        # password = self.password_input.text.strip()
-        #
-        # try:
-        #     worker = BankWorker.get(BankWorker.login == login, BankWorker.password == password)
-        #     self.manager.current = 'bank_dashboard'
-        # except BankWorker.DoesNotExist:
-        #     self.message_label.text = '[color=ff0000]Неверный логин или пароль[/color]'
-        #     # Убедись, что markup включен
-        #     self.message_label.markup = True
+        login = self.login_input.text.strip()
+        password = self.password_input.text.strip()
+        
+        try:
+            worker = BankWorker.get(BankWorker.login == login, BankWorker.password == password)
+            self.manager.current = 'bank_dashboard'
+        except BankWorker.DoesNotExist:
+            self.message_label.text = '[color=ff0000]Неверный логин или пароль[/color]'
+            # Убедись, что markup включен
+            self.message_label.markup = True
